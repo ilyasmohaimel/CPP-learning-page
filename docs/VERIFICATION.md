@@ -1,9 +1,48 @@
-# C17 and C++20 source release, 2026-10-16
+# Published C17 and C++20 workshop, 2026-10-16
+
+The primary workshop and the direct VPS application now run the C/C++ release
+from source commit `55c0693`:
+
+- [Public workshop](https://c-forge-workshop.tahuna-2388.chatgpt.site)
+- [Direct VPS access](https://c-forge.51.170.138.252.sslip.io:8445/forge/)
+
+The direct address reuses the existing free hostname, trusted TLS certificate
+and port 8445. Both entry points share accounts and saved work. Each hostname
+requires its own sign-in. No VPN, firewall, tunnel, certificate or unrelated
+service configuration was changed. VPN-off reachability from the learner's
+connection in mainland China remains untested.
+
+| Published check | Observed result |
+| --- | --- |
+| Primary publication | Saved version 10 deployed successfully; public access policy revision 2 and runtime environment revision 3 retained |
+| VPS application | Production subpath build installed; direct HTTPS application returns 200 with trusted TLS |
+| Native C++ course gate | All 108 worked examples, reference solutions and project programs/contracts passed inside the rootless GCC/G++ 14.2.0 runtime, covering 176 behavioral cases |
+| Native runner suite | Nine passed, zero failed, including C/C++, compiler failure, timeouts, excessive output, crash, cancellation, isolation and sanitizer diagnostics |
+| Production data | Consistent online backup and all-table expected-delta audit passed; only the intended content registry changed |
+| Published browser journey | Disposable account signup, canonical draft save, real C++ Run and successful Check passed on the primary workshop |
+| Shared saved work | A separate browser signed into the direct VPS application and restored the exact C++ draft and selected course; native Run passed there |
+| Rendered layout | Desktop and 390px screenshots inspected; no page overflow or application runtime errors in the live journey |
+
+Classic retains its existing frontend deployment. The updated backend keeps its
+default account-state response scoped to C17 for compatibility; the new frontend
+explicitly requests both courses. A focused regression test covers that contract.
+
+Both temporary browser-review accounts were removed by exact UUID, username and
+learner-role checks after consistent backups. Every retained database row and
+foreign key was verified. The temporary deployment workflow was removed; the
+original manual, read-only health workflow remains unchanged.
+
+The local checks below used disposable databases. Native production verification
+is recorded separately above; the local native-suite skip is not a native pass.
+
+---
+
+# Local C17 and C++20 checks, 2026-10-16
 
 The local repository now includes both complete course paths. C++20 has 12
 modules, 48 lessons, 105 exercises (57 compiler-backed and 48 conceptual), 12
 checkpoints, three projects and 48 reference entries. The C17 course IDs and
-curriculum are unchanged. No production account or database was used for tests.
+curriculum are unchanged. These local tests used no production account or database.
 
 | Check | Observed result |
 | --- | --- |
@@ -39,8 +78,8 @@ README previews are actual application screenshots from disposable test data:
 [desktop workspace](screenshots/preview-cpp-workspace.png),
 [dashboard](screenshots/preview-home.png), and
 [phone editor](screenshots/preview-mobile.png). Physical keyboards, other browser
-engines and mainland-China connectivity remain untested. The hosted primary and
-Classic deployments were not changed by these source edits.
+engines and mainland-China connectivity remain untested. These local checks
+preceded the primary publication recorded above.
 
 Earlier release evidence follows and applies to the versions and hosts stated.
 
