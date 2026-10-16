@@ -14,6 +14,14 @@ canonical draft restoration, profile save/cancel, photo upload, fresh-login
 restoration and phone photo removal. Scoped accessibility scans report no
 violations; the profile and dashboard screenshots were visually inspected.
 
+Source `1a70998` is deployed on the VPS and as primary Site version 11. The
+production gate passed all nine native runner tests, a real profile name/picture
+save and readback, canonical draft saving and native C++ grading. A consistent
+backup and all-table audit preserved existing learner data. The exact temporary
+release account was removed with retained-row and foreign-key checks. The
+temporary deployment workflow was removed; the original read-only health
+workflow remains unchanged. Direct HTTPS returns 200 with valid TLS.
+
 Earlier publication and native-host evidence follows.
 
 ---
