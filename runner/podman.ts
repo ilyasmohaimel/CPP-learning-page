@@ -29,6 +29,17 @@ export const COMPILER_FLAGS = [
   "-fno-omit-frame-pointer",
   "-fdiagnostics-color=never",
 ];
+export const CPP_COMPILER_FLAGS = [
+  "-std=c++20",
+  "-x",
+  "c++",
+  ...COMPILER_FLAGS.slice(3),
+];
+export function compilerFor(language: "c" | "cpp" = "c") {
+  return language === "cpp"
+    ? { command: "g++", extension: ".cpp", flags: CPP_COMPILER_FLAGS }
+    : { command: "gcc", extension: ".c", flags: COMPILER_FLAGS };
+}
 export interface RunnerConfig {
   engine?: string;
   image?: string;
@@ -218,24 +229,35 @@ export class PodmanRunner {
         );
       // Validate both ordinary and sanitizer toolchain invocation under actual resource limits.
       this.ready = true;
-      for (const sanitize of [false, true]) {
-        const result = await this.execute({
-          files: {
-            "main.c":
-              '#include <stdio.h>\nint main(void) { puts("preflight-ok"); return 0; }\n',
-          },
-          stdin: "",
-          sanitize,
-        });
-        if (result.state !== "succeeded" || result.stdout !== "preflight-ok\n")
-          throw new Error(
-            `${sanitize ? "Sanitizer" : "C17"} execution preflight failed.`,
-          );
-      }
+      for (const language of ["c", "cpp"] as const)
+        for (const sanitize of [false, true]) {
+          const result = await this.execute({
+            language,
+            files:
+              language === "cpp"
+                ? {
+                    "main.cpp":
+                      '#include <iostream>\nint main() { std::cout << "preflight-ok\\n"; }\n',
+                  }
+                : {
+                    "main.c":
+                      '#include <stdio.h>\nint main(void) { puts("preflight-ok"); return 0; }\n',
+                  },
+            stdin: "",
+            sanitize,
+          });
+          if (
+            result.state !== "succeeded" ||
+            result.stdout !== "preflight-ok\n"
+          )
+            throw new Error(
+              `${language === "cpp" ? "C++20" : "C17"}${sanitize ? " sanitizer" : ""} execution preflight failed.`,
+            );
+        }
       return {
         available: true,
         detail:
-          "GCC 14.2.0 · C17 · rootless Podman · cgroup v2 · isolated execution verified",
+          "GCC 14.2.0 · C17 / C++20 · rootless Podman · cgroup v2 · isolated execution verified",
       };
     } catch (error) {
       this.ready = false;
@@ -266,6 +288,8 @@ export class PodmanRunner {
         feedback:
           "The isolated compiler is unavailable. Your draft is still saved; execution needs a configured rootless worker.",
       };
+    const compiler = compilerFor(request.language);
+    const harnessName = `__forge_harness${compiler.extension}`;
     const start = performance.now();
     const temporary = await mkdtemp(join(tmpdir(), "c-forge-runner-"));
     const controller = new AbortController();
@@ -304,22 +328,22 @@ export class PodmanRunner {
           await mkdir(build, { mode: 0o700 });
           await this.writeFiles(source, request.files);
           if (harness)
-            await writeFile(join(source, "__forge_harness.c"), harness, {
+            await writeFile(join(source, harnessName), harness, {
               flag: "wx",
               mode: 0o600,
             });
           const names = Object.keys(request.files)
-            .filter((name) => name.endsWith(".c"))
+            .filter((name) => name.endsWith(compiler.extension))
             .sort();
-          if (harness) names.push("__forge_harness.c");
+          if (harness) names.push(harnessName);
           const name = `c-forge-compile-${randomUUID()}`;
           const flags = request.sanitize
             ? [
-                ...COMPILER_FLAGS,
+                ...compiler.flags,
                 "-fsanitize=address,undefined",
                 "-fno-sanitize-recover=all",
               ]
-            : COMPILER_FLAGS;
+            : compiler.flags;
           const compile = await this.container(
             [
               ...this.commonArgs(name, request.sanitize, true),
@@ -328,7 +352,7 @@ export class PodmanRunner {
               "--volume",
               `${build}:/build:rw,Z`,
               this.image,
-              "gcc",
+              compiler.command,
               ...flags,
               "-I/src",
               ...names.map((file) => `/src/${file}`),

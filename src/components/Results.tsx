@@ -8,13 +8,21 @@ import {
 import type { RunnerOutcome, JobState } from "../../shared/runner";
 import { explainDiagnostic } from "../../shared/diagnostics";
 interface Props {
+  standard?: string;
   job: { id: string; state: JobState; result: RunnerOutcome | null } | null;
   runner: { available: boolean; detail: string } | undefined;
   error: string;
   onLocation: (file: string, line: number, column: number) => void;
   onCancel: () => void;
 }
-export function Results({ job, runner, error, onLocation, onCancel }: Props) {
+export function Results({
+  standard = "C17",
+  job,
+  runner,
+  error,
+  onLocation,
+  onCancel,
+}: Props) {
   const result = job?.result;
   const busy = job && ["queued", "compiling", "running"].includes(job.state);
   const message = result?.feedback;
@@ -46,7 +54,7 @@ export function Results({ job, runner, error, onLocation, onCancel }: Props) {
             <div>
               <strong>Runner unavailable</strong>
               <p>
-                Drafts save here. Isolated C execution needs the self-hosted
+                Drafts save here. Isolated C/C++ execution needs the self-hosted
                 worker.
               </p>
               <details>
@@ -67,7 +75,7 @@ export function Results({ job, runner, error, onLocation, onCancel }: Props) {
             {job.state === "queued"
               ? "Waiting for the isolated worker…"
               : job.state === "compiling"
-                ? "Compiling as C17…"
+                ? `Compiling as ${standard}…`
                 : "Running within the resource limits…"}
           </p>
         ) : null}

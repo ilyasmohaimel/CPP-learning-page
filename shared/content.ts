@@ -1,3 +1,4 @@
+export type Language = "c" | "cpp";
 export type SourceFiles = Record<string, string>;
 export type Assessment =
   "stdout" | "numeric" | "function" | "prediction" | "diagnosis" | "reflection";
@@ -11,6 +12,7 @@ export interface Case {
   args?: string[];
 }
 export interface Exercise {
+  language?: Language;
   id: string;
   version: number;
   lessonId: string;

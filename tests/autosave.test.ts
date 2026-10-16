@@ -154,7 +154,7 @@ test("unknown network outcomes reuse the mutation ID before newer edits are sent
   await h.controller.start();
   h.controller.update({ notes: "original uncertain save" });
   await h.controller.flush();
-  assert.equal(h.controller.getSnapshot().status, "Save failed — retry");
+  assert.equal(h.controller.getSnapshot().status, "Save failed. Retry");
   h.controller.update({ notes: "newer edit" });
   await h.controller.flush();
   assert.equal(saves.length, 3);
@@ -213,10 +213,7 @@ test("a genuine server revision conflict preserves both versions until explicit 
   await h.controller.flush();
   await h.controller.flush();
   assert.equal(calls, 1);
-  assert.equal(
-    h.controller.getSnapshot().status,
-    "Conflict — choose a version",
-  );
+  assert.equal(h.controller.getSnapshot().status, "Conflict. Choose a version");
   assert.equal(
     h.controller.getSnapshot().conflict?.local.data.notes,
     "this device",
@@ -359,7 +356,7 @@ test("an unauthenticated load does not display cached account drafts", async () 
   });
   await h.controller.start();
   assert.equal(h.controller.getSnapshot().data, null);
-  assert.equal(h.controller.getSnapshot().status, "Save failed — retry");
+  assert.equal(h.controller.getSnapshot().status, "Save failed. Retry");
   assert.equal(h.writes.length, 0);
   h.controller.dispose();
 });
@@ -464,7 +461,7 @@ test("an unsuccessful recovery archive rejects so the reset action can keep the 
     h.controller.getSnapshot().data?.files["main.c"],
     "valuable work",
   );
-  assert.equal(h.controller.getSnapshot().status, "Save failed — retry");
+  assert.equal(h.controller.getSnapshot().status, "Save failed. Retry");
   h.controller.dispose();
 });
 

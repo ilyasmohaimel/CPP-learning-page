@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import type {
   Draft,
   DraftConflict,
@@ -20,8 +21,8 @@ export type SaveStatus =
   | "Saved on this device"
   | "Syncing"
   | "Saved to account"
-  | "Save failed — retry"
-  | "Conflict — choose a version";
+  | "Save failed. Retry"
+  | "Conflict. Choose a version";
 
 export interface DraftSnapshot {
   draft: Draft | null;
@@ -159,7 +160,7 @@ export class DraftController {
       [401, 403].includes(remoteResult.reason.status)
     ) {
       this.publish({
-        status: "Save failed — retry",
+        status: "Save failed. Retry",
         error: message(remoteResult.reason),
       });
       return;
@@ -191,7 +192,7 @@ export class DraftController {
       conflict: pendingLocal ? (local.conflict ?? null) : null,
       status: pendingLocal
         ? local.conflict
-          ? "Conflict — choose a version"
+          ? "Conflict. Choose a version"
           : "Saved on this device"
         : remote
           ? "Saved to account"
@@ -239,7 +240,7 @@ export class DraftController {
       draft,
       data: next,
       status: this.snapshot.conflict
-        ? "Conflict — choose a version"
+        ? "Conflict. Choose a version"
         : "Saving locally",
       conflict: this.snapshot.conflict
         ? { ...this.snapshot.conflict, local: draft }
@@ -283,7 +284,7 @@ export class DraftController {
       } catch (error) {
         this.localFailed = true;
         this.publish({
-          status: "Save failed — retry",
+          status: "Save failed. Retry",
           error: `Device recovery failed: ${message(error)} Account saving will still be attempted.`,
         });
       }
@@ -331,7 +332,7 @@ export class DraftController {
       if (!this.online()) {
         this.publish({
           status: this.localFailed
-            ? "Save failed — retry"
+            ? "Save failed. Retry"
             : "Saved on this device",
           error:
             "Offline drafting is available. Running and checking require the server.",
@@ -390,7 +391,7 @@ export class DraftController {
                 data: structuredClone(this.snapshot.data),
               },
             },
-            status: "Conflict — choose a version",
+            status: "Conflict. Choose a version",
             error:
               "This draft also changed in another tab or device. Both versions are preserved. Choose which version to continue with.",
           });
@@ -399,7 +400,7 @@ export class DraftController {
         } else {
           this.publish({
             status: this.online()
-              ? "Save failed — retry"
+              ? "Save failed. Retry"
               : "Saved on this device",
             error: message(error),
           });
@@ -477,7 +478,7 @@ export class DraftController {
                 },
               }
             : conflict,
-        status: "Conflict — choose a version",
+        status: "Conflict. Choose a version",
         error: message(error),
       });
       this.persist();
@@ -499,7 +500,7 @@ export class DraftController {
       );
     } catch (error) {
       this.publish({
-        status: "Save failed — retry",
+        status: "Save failed. Retry",
         error: `Recovery copy failed: ${message(error)} Your draft has not been reset.`,
       });
       throw error;
@@ -556,6 +557,7 @@ export function useDraft(
   contentVersion: number,
   starter: SourceFiles,
 ) {
+  const client = useQueryClient();
   const [owner, setOwner] = useState(getLocalOwner);
   const [controller, setController] = useState<DraftController | null>(null);
   const [snapshot, setSnapshot] = useState<DraftSnapshot>({
@@ -574,7 +576,7 @@ export function useDraft(
       setSnapshot({
         draft: null,
         data: null,
-        status: "Save failed — retry",
+        status: "Save failed. Retry",
         conflict: null,
         error: "Sign in to save your work.",
       });
@@ -595,8 +597,14 @@ export function useDraft(
       ),
       transport: {
         load: () => api<Draft | null>(path),
-        save: (save) =>
-          api<Draft>(path, { method: "PUT", body: JSON.stringify(save) }),
+        save: async (save) => {
+          const draft = await api<Draft>(path, {
+            method: "PUT",
+            body: JSON.stringify(save),
+          });
+          void client.invalidateQueries({ queryKey: ["state", owner] });
+          return draft;
+        },
         resolve: (conflictId, choice, revision) =>
           api<Draft>(`${path}/resolve`, {
             method: "POST",
@@ -625,7 +633,7 @@ export function useDraft(
       void next.flush().finally(() => next.dispose());
     };
     // Stable exercise IDs/versions define controller lifetime; starter objects are content data.
-  }, [exerciseId, contentVersion, owner]);
+  }, [exerciseId, contentVersion, owner, client]);
 
   const update = useCallback(
     (patch: Partial<DraftData>) => controller?.update(patch),

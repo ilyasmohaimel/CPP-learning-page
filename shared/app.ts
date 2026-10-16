@@ -6,6 +6,7 @@ import type {
   Reference,
 } from "./content.js";
 export interface Preferences {
+  courseId?: "c17" | "cpp20";
   theme: "dark" | "light" | "system";
   proseSize: number;
   editorSize: number;
@@ -118,6 +119,7 @@ export interface LearnerState {
   activity: Activity[];
   reviews: ReviewItem[];
   enrolled: boolean;
+  courseResumes?: Record<string, Resume | null>;
 }
 export interface LessonResponse {
   lesson: PublicLesson;

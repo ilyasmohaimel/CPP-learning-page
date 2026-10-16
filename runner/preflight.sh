@@ -2,6 +2,7 @@
 set -eu
 test "$(id -u)" -ne 0
 test "$(gcc -dumpfullversion)" = 14.2.0
+test "$(g++ -dumpfullversion)" = 14.2.0
 test "$(awk '/^NoNewPrivs:/ {print $2}' /proc/self/status)" = 1
 test "$(awk '/^Seccomp:/ {print $2}' /proc/self/status)" = 2
 test "$(awk '/^CapEff:/ {print $2}' /proc/self/status)" = 0000000000000000

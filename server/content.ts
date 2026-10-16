@@ -11,6 +11,28 @@ export function loadContent(): Curriculum {
     readFileSync("content/curriculum.json", "utf8"),
   ) as Curriculum;
 }
+export function loadCourses(): Curriculum[] {
+  const courses = [
+    loadContent(),
+    JSON.parse(
+      readFileSync("content/cpp-curriculum.json", "utf8"),
+    ) as Curriculum,
+  ];
+  for (const kind of [
+    "modules",
+    "lessons",
+    "exercises",
+    "projects",
+    "references",
+  ] as const) {
+    const ids = courses.flatMap((course) =>
+      course[kind].map((item) => item.id),
+    );
+    if (new Set(ids).size !== ids.length)
+      throw new Error(`Duplicate ${kind} IDs across courses.`);
+  }
+  return courses;
+}
 export function publicLesson(l: Lesson): PublicLesson {
   return {
     ...l,

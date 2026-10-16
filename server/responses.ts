@@ -61,6 +61,18 @@ const state = z
         .strict(),
     ),
     enrolled: z.boolean(),
+    courseResumes: z
+      .record(
+        z.string(),
+        z
+          .object({
+            lessonId: z.string(),
+            exerciseId: z.string(),
+            step: z.number().int(),
+          })
+          .nullable(),
+      )
+      .optional(),
   })
   .strict();
 const job = z

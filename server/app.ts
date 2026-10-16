@@ -3,7 +3,7 @@ import statics from "@fastify/static";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { Store } from "./db.js";
-import { loadContent } from "./content.js";
+import { loadCourses } from "./content.js";
 import type { Curriculum } from "../shared/content.js";
 import type { Context } from "./context.js";
 import { notFound, now } from "./context.js";
@@ -59,11 +59,20 @@ export async function createApp(options: AppOptions) {
         : false,
     }),
     store = new Store(options.databasePath),
-    content = options.content ?? loadContent();
+    courses = options.content ? [options.content] : loadCourses(),
+    content = {
+      ...courses[0],
+      modules: courses.flatMap((c) => c.modules),
+      lessons: courses.flatMap((c) => c.lessons),
+      exercises: courses.flatMap((c) => c.exercises),
+      projects: courses.flatMap((c) => c.projects),
+      references: courses.flatMap((c) => c.references),
+    };
   const ctx: Context = {
     app,
     store,
     content,
+    courses,
     bootstrapSecret: options.bootstrapSecret,
     runnerSecret: options.runnerSecret ?? "",
     publicRegistration: options.publicRegistration ?? false,

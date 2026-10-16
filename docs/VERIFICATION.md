@@ -1,4 +1,52 @@
-# Theme persistence and live-page review — 2026-10-16
+# C17 and C++20 source release, 2026-10-16
+
+The local repository now includes both complete course paths. C++20 has 12
+modules, 48 lessons, 105 exercises (57 compiler-backed and 48 conceptual), 12
+checkpoints, three projects and 48 reference entries. The C17 course IDs and
+curriculum are unchanged. No production account or database was used for tests.
+
+| Check | Observed result |
+| --- | --- |
+| Typecheck, lint and formatting | Pass |
+| Unit/integration tests | 56 passed, one native isolation suite skipped |
+| Course structural audit | Both courses pass schema, manifests, DAG, membership, language/file validation and assessment checks |
+| C++ trusted authoring | 108 syntax checks and 108 fixed worked-example/reference programs or contracts pass; 48 textual contracts pass |
+| Original browser journeys | 10 passed in 48.5 seconds |
+| Account/theme browser journeys | Two passed in 15.1 seconds |
+| Separate two-course journey | Passed with final mobile and conceptual-check coverage in 10.5 seconds |
+| C++ workspace accessibility | No violations in the scoped axe scan |
+| Desktop and 390px phone layout | Rendered screenshots inspected; no page-level horizontal overflow |
+| Full local preview command | Build and Fastify/SQLite startup checked with `npm run preview` |
+
+The two-course browser journey polls canonical server drafts for the exact new
+source, switches languages, restores each resume position, and checks a fresh
+browser login. It also verifies course-specific reference/project lists, editor
+labels, a real conceptual check and honest runner-unavailable feedback. A stale dashboard cache found in
+that journey was fixed by invalidating account state after acknowledged saves.
+The course selector was widened and its labels shortened after phone screenshot
+review. No test assertions were removed to hide those failures.
+
+Local environment: Node 26.11.1, npm 12.2.0, system Chromium, GCC/G++ 16.2.1 using
+explicit language-standard flags. Trusted authoring execution reads only fixed
+version-controlled course examples and solutions. It is not learner execution
+and does not verify the GCC 14.2.0 container, rootless isolation or sanitizers.
+The opt-in native suite now includes C++ behavior, compilation failure and ASan
+checks, but remains skipped locally because Podman is absent. The updated worker
+must pass both C17 and C++20 preflight on its configured host before C++ execution
+can be called verified. Older C-only worker heartbeats cannot enable C++ jobs.
+
+README previews are actual application screenshots from disposable test data:
+[desktop workspace](screenshots/preview-cpp-workspace.png),
+[dashboard](screenshots/preview-home.png), and
+[phone editor](screenshots/preview-mobile.png). Physical keyboards, other browser
+engines and mainland-China connectivity remain untested. The hosted primary and
+Classic deployments were not changed by these source edits.
+
+Earlier release evidence follows and applies to the versions and hosts stated.
+
+---
+
+# Theme persistence and live-page review. 2026-10-16
 
 See [appearance verification](THEMES.md). Light is the default; selected
 appearance persists in the account and a non-sensitive early-paint cache.
@@ -15,10 +63,10 @@ Previous release evidence follows.
 
 ---
 
-# Presentation update — 2026-10-16
+# Presentation update. 2026-10-16
 
 The existing public workshop receives a frontend-only redesign guided by
-Anthropic's official frontend-design skill. Accounts and saved work remain on
+the existing design system. Accounts and saved work remain on
 the same VPS backend. Server, migrations, session/data contracts, runner, Worker
 proxy and native runtime bindings are unchanged; no production data operation
 is part of this release. [Design and QA notes](DESIGN.md) record the system and
@@ -35,12 +83,12 @@ operations; no new native-host test is implied by a CSS/component update.
 
 ---
 
-# Verification report — public release, 2026-10-14
+# Verification report. public release, 2026-10-14
 
 **Public workshop: https://c-forge-workshop.tahuna-2388.chatgpt.site**
 
 Native Site access policy is PUBLIC, revision2. Anyone with the link can choose
-Create account and use an independent C Forge username/password; no ChatGPT
+Create account and use an independent C Forge username/password; no platform
 login is required. React/API bridge run on Sites; durable account data and native
 GCC run on the mounted Ubuntu VPS volume. Existing owner passwords, sessions and
 saved work survived migration002. No Hiddify, tunnel, VPN, Nginx, firewall or
@@ -59,7 +107,7 @@ certificate changes were made during this account release.
 | Same-account versus shared export                           | Pass; own trusted progress restores, another learner's export requires a fresh proficiency check, colliding attempt IDs remapped idempotently                         |
 | VPS upgrade run38499841337                                  | Pass; consistent backup, all12 legacy account-data table fingerprints unchanged, production rebuild and API/rootless worker healthy                                   |
 | Hosted two-account browser QA                               | Pass; real server saves, native C17 Run/Check, distinct progress, cross-account job404 and fresh-login resume                                                         |
-| Anonymous hosted browser QA                                 | Pass without platform service token or ChatGPT cookies; two existing independently registered accounts, trusted TLS, desktop1440px/phone390px, no horizontal overflow |
+| Anonymous hosted browser QA                                 | Pass without platform service token or platform cookies; two existing independently registered accounts, trusted TLS, desktop1440px/phone390px, no horizontal overflow |
 | Exact test-account cleanup run38503175837                   | Pass;4 matching UUID/name/learner-role fixtures removed, all retained database rows unchanged, foreign keys valid; no whole database restore                          |
 | Final administrator workflow                                | Manual-only, read-only health checks; automatic source/deletion trigger removed                                                                                       |
 
@@ -92,7 +140,7 @@ by the public multi-account release above.
 
 ---
 
-# Foundation verification — 2026-10-13 (historical)
+# Foundation verification. 2026-10-13 (historical)
 
 Published owner-private at **https://c-forge-workshop.tahuna-2388.chatgpt.site**.
 The complete React frontend and API bridge are hosted by Sites. The real
@@ -254,8 +302,8 @@ E: Source/lockfile/migration/docs, checks/build/packaging, hosted publication,
 production startup/restart, consistent backup/restore and guarded recovery verified.
 
 Remaining limits: no physical iOS/Android or actual onscreen-keyboard test;
-no independent end-user ChatGPT OAuth login performed by automation (private
+no independent end-user platform OAuth login performed by automation (private
 service access was used); no mainland-China reachability measurement; no future
 certificate renewal rollover; no off-host disaster recovery; no LeakSanitizer.
 Offline reading covers already opened/cached material, not the whole course or
-server execution. No AI feature was added. These limits are not completed features.
+server execution.  These limits are not completed features.

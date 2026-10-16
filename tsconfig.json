@@ -24,6 +24,7 @@
     "playwright.config.ts",
     "playwright.https.config.ts",
     "playwright.subpath.config.ts",
-    "playwright.multi.config.ts"
+    "playwright.multi.config.ts",
+    "playwright.courses.config.ts"
   ]
 }

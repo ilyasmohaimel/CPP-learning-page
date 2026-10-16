@@ -1,10 +1,10 @@
 # Use C Forge on your phone and Linux PC
 
-The currently published workshop is [the public ChatGPT Site](https://c-forge-workshop.tahuna-2388.chatgpt.site). Open it in your browser on phone or Linux. Choose Create account, or sign into your existing C Forge account; no ChatGPT login is required. Its saved work and compiler are on the persistent VPS. See [SITES.md](SITES.md) and [VPS.md](VPS.md); the commands below remain portable self-hosting alternatives.
+The currently published workshop is [the public hosted Site](https://c-forge-workshop.tahuna-2388.chatgpt.site). Open it in your browser on phone or Linux. Choose Create account, or sign into your existing C Forge account; no platform login is required. Its saved work and compiler are on the persistent VPS. See [SITES.md](SITES.md) and [VPS.md](VPS.md); the commands below remain portable self-hosting alternatives.
 
 Run C Forge once on your Ubuntu server. Open **the same HTTPS address** in your
 phone browser and your Linux browser, and sign in with the same learner account.
-Neither client needs Node, GCC, Docker, an AI key, or a VPN. The server handles
+Neither client needs Node, GCC, Docker, a paid service account, or a VPN. The server handles
 saved work and, after worker setup, compilation. A public URL has not yet been
 deployed: the actual domain/server connection still needs to be supplied.
 
@@ -124,7 +124,7 @@ Existing opened-tab offline recovery remains as documented in the README.
 Settings → “Your phone and Linux PC” shows the current workshop address and a
 copy action, with an explicit warning for localhost-only addresses.
 
-The installed application loads no third-party fonts/CDNs/AI. DNS, certificate
+The installed application loads no third-party fonts or CDNs. DNS, certificate
 issuance, initial image/package downloads and the server's route from mainland
 China still need real network verification; no China-accessibility claim has
 been made. After initial hosting, clients reach your server directly over HTTPS,

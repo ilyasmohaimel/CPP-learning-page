@@ -7,8 +7,8 @@ export const filename = z
     (n) =>
       !n.includes("..") &&
       !n.startsWith("__forge_") &&
-      (/\.(c|h|txt)$/.test(n) || n === "Makefile"),
-    "Use a simple .c, .h, .txt filename or Makefile.",
+      (/\.(c|h|cpp|hpp|txt)$/.test(n) || n === "Makefile"),
+    "Use a simple .c, .h, .cpp, .hpp, .txt filename or Makefile.",
   );
 export const files = z
   .record(
@@ -60,6 +60,7 @@ export const draftSave = z
   .strict();
 export const preferences = z
   .object({
+    courseId: z.enum(["c17", "cpp20"]).optional(),
     theme: z.enum(["dark", "light", "system"]),
     proseSize: z.number().min(16).max(24),
     editorSize: z.number().min(12).max(24),

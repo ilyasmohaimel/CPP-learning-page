@@ -1,4 +1,4 @@
-# Public registration and account isolation — 2026-10-14
+# Public registration and account isolation. 2026-10-14
 
 The owner requested a public link where friends create accounts and keep their
 own saves. The release uses the existing Site and durable VPS database.
@@ -73,7 +73,7 @@ active; no Nginx, VPN, tunnel, firewall or certificate changes were made.
 
 The published Site policy is PUBLIC (revision2). Two fresh temporary accounts
 registered with no bootstrap field. A subsequent two-account browser journey
-used no ChatGPT cookies or platform authorization header: distinct server code,
+used no platform cookies or platform authorization header: distinct server code,
 real isolated GCC Run/Check, private results/proficiency, fresh-login resume and
 390px touch layout all passed over trusted HTTPS. Automated test accounts are
 removed only by UUID/name/learner-role guards and a transaction comparing all

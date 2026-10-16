@@ -1,3 +1,29 @@
+# Two-course architecture
+
+The application loads separate C17 and C++20 curricula. Every C++ lesson,
+exercise, project and reference uses a `cpp-` ID. The combined registry supports
+existing drafts, histories, imports and jobs without changing the C IDs or data
+schema. `/api/course?course=c17|cpp20` selects navigation; lesson and exercise
+access still use stable IDs.
+
+The revision-checked `courseId` preference saves the selected course. The state
+response includes a resume for each course, derived from its most recently saved
+draft when the global resume belongs to the other course. Successful draft saves
+invalidate the account-state cache so the dashboard reflects the acknowledged
+resume position. Account ownership and conflict handling use the same paths for
+both languages.
+
+The server stamps each native job's language from its exercise contract. The
+worker accepts only C or C++ payloads and matching source extensions. C uses GCC
+with explicit C17 flags; C++ uses G++ with explicit C++20 flags. The compiler image,
+container restrictions and limits are shared. A legacy C-only worker remains
+available for C but cannot enable C++ jobs. The updated worker advertises C++ only
+after both normal and sanitized preflight samples succeed.
+
+The sections below document the existing account, storage and execution systems.
+Historical host verification applies to the release described there; new C++
+isolation still requires a configured worker host.
+
 # Architecture and data ownership
 
 C Forge uses React 19 + TypeScript + Vite, React Router, one server-state library
@@ -6,9 +32,9 @@ C Forge uses React 19 + TypeScript + Vite, React Router, one server-state librar
 ORM: the single-server model needs explicit transactions and versioned
 SQL migrations rather than a large abstraction. SQLite is deliberately
 **development storage in the cloud workspace**, and durable application storage
-on the mounted VPS volume. The public ChatGPT Site hosts the existing React
+on the mounted VPS volume. The public hosted Site hosts the existing React
 frontend plus a small Worker API bridge; the Node/Fastify/SQLite backend and
-isolated compiler stay on the VPS. Public Site access needs no ChatGPT login; C Forge sessions authorize learner data.
+isolated compiler stay on the VPS. Public Site access needs no platform login; C Forge sessions authorize learner data.
 D1/R2 are unused because the existing transactional backend is retained. This
 avoids replacing verified persistence with a static frontend or untested adapter.
 The detailed Worker identity/cookie/secret boundary is in SITES.md.
@@ -121,8 +147,7 @@ does not detect leaks. Passing tests/sanitizers does not prove correctness.
 
 The C17 course graph has 12 ordered modules, 48 substantive lessons, 105 exercises,
 12 checkpoints, and three assessed projects. C17 is a deliberate baseline, not
-the latest standard. C++ is a separate future course model, with no fake second
-course navigation. Predictions, code edits/functions, diagnoses, memory reasoning,
+the latest standard. C++ has a separate complete course and navigation model. Predictions, code edits/functions, diagnoses, memory reasoning,
 progressive hints, and project milestones exercise distinct objectives.
 
 The deterministic retrieval schedule uses 1/3/7/14/30-day intervals. A failed check
@@ -173,6 +198,6 @@ retention, reserves disk space, and will not duplicate today's snapshot. These
 backups live on this VPS; off-host disaster recovery is not provisioned.
 
 Initial dependency/image downloads, hosted access and DNS need network
-access. Mainland-China availability was not tested. No AI is required or included.
+access. Mainland-China availability was not tested. All course functionality runs without a paid service.
 Scoped WCAG scans, keyboard checks and responsive screenshots are evidence for
 those views, not certification across every browser or assistive technology.

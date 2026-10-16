@@ -72,7 +72,7 @@ export function recordAttempt(
       new Date(Date.now() + (passed && !help ? 86400000 : 0)).toISOString(),
       passed
         ? help
-          ? "Passed with help — revisit independently."
+          ? "Passed with help. Revisit independently."
           : "Passed independently."
         : "A check needs another attempt.",
     );
@@ -189,7 +189,33 @@ export function learnerState(ctx: Context, owner: string): LearnerState {
           : "Spaced retrieval after your earlier practice.",
     };
   });
+  const courseResumes: Record<string, LearnerState["resume"]> = {};
+  const globalResume = row.resume
+    ? (JSON.parse(row.resume) as LearnerState["resume"])
+    : null;
+  for (const course of ctx.courses) {
+    const ids = course.exercises.map((e) => e.id);
+    const latest = ids.length
+      ? ctx.store.get<{ exercise_id: string; step: number }>(
+          `SELECT exercise_id, json_extract(data, '$.step') AS step FROM drafts WHERE owner_id=? AND exercise_id IN (${ids.map(() => "?").join(",")}) ORDER BY updated_at DESC LIMIT 1`,
+          owner,
+          ...ids,
+        )
+      : undefined;
+    const exercise = course.exercises.find((e) => e.id === latest?.exercise_id);
+    courseResumes[course.course.id] =
+      globalResume && course.lessons.some((l) => l.id === globalResume.lessonId)
+        ? globalResume
+        : exercise && latest
+          ? {
+              lessonId: exercise.lessonId,
+              exerciseId: exercise.id,
+              step: latest.step,
+            }
+          : null;
+  }
   return {
+    courseResumes,
     preferences: JSON.parse(row.preferences),
     preferencesRevision: row.preferences_revision,
     resume: row.resume ? JSON.parse(row.resume) : null,
@@ -201,8 +227,14 @@ export function learnerState(ctx: Context, owner: string): LearnerState {
 }
 export function learningRoutes(ctx: Context) {
   const { app, store, content } = ctx;
-  app.get("/api/course", async (req) => {
+  const selectedCourse = (id = "c17") =>
+    ctx.courses.find((c) => c.course.id === id) ??
+    (() => {
+      throw Object.assign(new Error("Course not found."), { statusCode: 404 });
+    })();
+  app.get<{ Querystring: { course?: string } }>("/api/course", async (req) => {
     requireOwner(req);
+    const content = selectedCourse(req.query.course);
     return {
       course: content.course,
       modules: content.modules,
@@ -362,13 +394,16 @@ export function learningRoutes(ctx: Context) {
       return { reference: p.reference, explanation: p.explanation };
     },
   );
-  app.get<{ Querystring: { q?: string } }>("/api/reference", async (req) => {
-    requireOwner(req);
-    const q = (req.query.q ?? "").slice(0, 200).toLowerCase();
-    return content.references.filter((r) =>
-      `${r.title} ${r.body} ${r.tags.join(" ")}`.toLowerCase().includes(q),
-    );
-  });
+  app.get<{ Querystring: { q?: string; course?: string } }>(
+    "/api/reference",
+    async (req) => {
+      requireOwner(req);
+      const q = (req.query.q ?? "").slice(0, 200).toLowerCase();
+      return selectedCourse(req.query.course).references.filter((r) =>
+        `${r.title} ${r.body} ${r.tags.join(" ")}`.toLowerCase().includes(q),
+      );
+    },
+  );
   app.post<{ Params: { id: string } }>("/api/review/:id", async (req) => {
     const owner = requireOwner(req),
       e = ctx.exercise(req.params.id),

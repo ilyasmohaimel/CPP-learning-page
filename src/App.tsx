@@ -70,14 +70,30 @@ export default function App() {
     queryFn: () => api<{ id: string; username: string }>("/api/auth/me"),
     retry: false,
   });
-  const course = useQuery({
-    queryKey: ["course", me.data?.id],
-    queryFn: () => api<CourseMap>("/api/course"),
-    enabled: !!me.data,
-  });
   const state = useQuery({
     queryKey: ["state", me.data?.id],
     queryFn: () => api<LearnerState>("/api/state"),
+    enabled: !!me.data,
+  });
+  const routeCourse = location.pathname.startsWith("/lesson/")
+    ? location.pathname.split("/")[2]?.startsWith("cpp-")
+      ? "cpp20"
+      : "c17"
+    : location.pathname.startsWith("/projects/")
+      ? location.pathname.split("/")[2]?.startsWith("cpp-")
+        ? "cpp20"
+        : "c17"
+      : new URLSearchParams(location.search).get("project")
+        ? new URLSearchParams(location.search)
+            .get("project")!
+            .startsWith("cpp-")
+          ? "cpp20"
+          : "c17"
+        : null;
+  const courseId = routeCourse ?? state.data?.preferences.courseId ?? "c17";
+  const course = useQuery({
+    queryKey: ["course", me.data?.id, courseId],
+    queryFn: () => api<CourseMap>(`/api/course?course=${courseId}`),
     enabled: !!me.data,
   });
   const refresh = () => {
@@ -138,8 +154,10 @@ export default function App() {
         }),
       });
       await client.invalidateQueries({ queryKey: ["state"] });
+      return true;
     } catch (e) {
       setError(e instanceof Error ? e.message : "Preference save failed.");
+      return false;
     } finally {
       setPreferenceBusy(false);
     }
@@ -181,7 +199,23 @@ export default function App() {
         </button>
       </div>
     );
-  const props = { course: course.data, state: state.data, onRefresh: refresh };
+  const lessonIds = new Set(course.data.lessons.map((l) => l.id));
+  const exerciseIds = new Set(
+    course.data.lessons.flatMap((l) => l.exerciseIds),
+  );
+  const scopedState: LearnerState = {
+    ...state.data,
+    resume:
+      state.data.courseResumes?.[courseId] ??
+      (state.data.resume && lessonIds.has(state.data.resume.lessonId)
+        ? state.data.resume
+        : null),
+    progress: state.data.progress.filter((p) => lessonIds.has(p.lessonId)),
+    reviews: state.data.reviews.filter((r) => lessonIds.has(r.lessonId)),
+    activity: state.data.activity.filter((a) => exerciseIds.has(a.exerciseId)),
+  };
+  const props = { course: course.data, state: scopedState, onRefresh: refresh };
+  const languageName = courseId === "cpp20" ? "C++" : "C";
   const lessonId = location.pathname.startsWith("/lesson/")
       ? location.pathname.split("/")[2]
       : null,
@@ -258,10 +292,17 @@ export default function App() {
           </section>
         ) : (
           <div className="sidebar-note">
-            <span className="language-logo">C</span>
+            <span
+              className={`language-logo ${courseId === "cpp20" ? "cpp-logo" : ""}`}
+            >
+              {languageName}
+            </span>
             <div>
-              <strong>C programming</strong>
-              <small>48 focused lessons · C17</small>
+              <strong>{course.data.course.title}</strong>
+              <small>
+                {course.data.lessons.length} lessons ·{" "}
+                {course.data.course.standard}
+              </small>
             </div>
           </div>
         )}
@@ -302,7 +343,7 @@ export default function App() {
             >
               <PanelLeftClose size={19} />
             </button>
-            <span>C programming</span>
+            <span>{course.data.course.title}</span>
             {module ? (
               <>
                 <ChevronRight size={14} />
@@ -311,9 +352,24 @@ export default function App() {
             ) : null}
           </div>
           <div className="topbar-actions">
+            <label className="course-picker">
+              <span className="sr-only">Course</span>
+              <select
+                aria-label="Course"
+                value={courseId}
+                disabled={preferenceBusy}
+                onChange={async (event) => {
+                  const next = event.target.value as "c17" | "cpp20";
+                  if (await quickPreference({ courseId: next })) navigate("/");
+                }}
+              >
+                <option value="c17">C17</option>
+                <option value="cpp20">C++20</option>
+              </select>
+            </label>
             <span className="standard-label">
               <span />
-              C17 course
+              {course.data.course.standard} course
             </span>
             <button
               className="icon-button"
@@ -393,7 +449,7 @@ export default function App() {
         </main>
         <footer className="app-footer">
           Made for deliberate practice.{" "}
-          <span>C and C++ are distinct languages. This course teaches C.</span>
+          <span>C and C++ have separate courses and saved work.</span>
         </footer>
       </div>
     </div>

@@ -82,9 +82,7 @@ const Editor = forwardRef<EditorHandle, Props>(function Editor(
             { tag: tags.function(tags.variableName), color: "var(--blue)" },
           ]),
         ),
-        language.current.of(
-          filename.endsWith(".c") || filename.endsWith(".h") ? cpp() : [],
-        ),
+        language.current.of(/\.(c|h|cpp|hpp)$/.test(filename) ? cpp() : []),
         keymap.of([
           {
             key: "Mod-Enter",

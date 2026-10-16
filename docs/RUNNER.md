@@ -5,7 +5,7 @@ the worker and rootless Podman. The cloud preview has no usable Podman runtime;
 execution is deliberately unavailable there. Local GCC can check **trusted,
 version-controlled course syntax**; learner submissions never use host GCC.
 
-The fixed image uses GCC **14.2.0**, explicitly `-std=c17 -x c`. C17 is the
+The fixed image uses GCC **14.2.0**, explicitly `-std=c17 -x c` for C or `-std=c++20 -x c++` through G++ for C++. C17 is the
 course baseline, not the latest C standard. GCC's [C standards support](https://gcc.gnu.org/projects/c-status.html)
 and [language standards](https://gcc.gnu.org/onlinedocs/gcc/Standards.html)
 document explicit C17 selection. Warnings use `-Wall -Wextra -Wpedantic
@@ -20,7 +20,7 @@ Compilation and execution each use a new container. Both use network `none`,
 the maintained Podman default seccomp profile, all capabilities dropped,
 `no-new-privileges`, a nonroot mapped user, read-only image, 64 processes, one CPU,
 64 open descriptors, disabled core dumps and 8 MiB file-size limit. A preflight
-checks actual seccomp/capability/NNP state, cgroup memory and process limits,
+checks both GCC and G++ 14.2.0 and actual seccomp/capability/NNP state, cgroup memory and process limits,
 network interfaces, read-only base and compiler version. Rootless **cgroup v2**
 is required; unsupported hosts fail closed.
 
@@ -41,8 +41,8 @@ Execution has a 2.5 second wall budget, 3 second CPU limit and 512 MiB memory.
 Diagnostic mode uses supported `-fsanitize=address,undefined` and
 `-fno-sanitize-recover=all`, 4 seconds and 1 GiB memory. It deliberately avoids
 `RLIMIT_AS` because AddressSanitizer reserves large virtual address ranges.
-Preflight compiles and runs a normal and a sanitized C17 sample under these
-limits. A clean sanitizer run does not prove correctness. See the official
+Preflight compiles and runs normal and sanitized samples for both C17 and
+C++20 under these limits. A clean sanitizer run does not prove correctness. See the official
 [GCC instrumentation options](https://gcc.gnu.org/onlinedocs/gcc/Instrumentation-Options.html).
 
 `ASAN_OPTIONS=detect_leaks=0:halt_on_error=1` disables **LeakSanitizer only**.
@@ -64,7 +64,7 @@ labelled abandoned containers and owned temporary directories at startup.
 The API explicitly fails expired leases instead of keeping interrupted jobs
 spinning indefinitely.
 
-Each payload permits at most 12 flat filenames (`.c`, `.h`, `.txt`, or
+Each payload permits at most 12 flat filenames (`.c`, `.h`, `.cpp`, `.hpp`, `.txt`, or
 `Makefile`), 128 KiB total source, 8 KiB stdin, 12 test cases and 64 KiB fixtures
 per case. Paths, traversal, reserved harness filenames and NUL text are rejected.
 Program arguments come from authored server contracts, not unrestricted browser
@@ -220,6 +220,7 @@ On the prepared rootless host, with its pinned image:
 ```sh
 CFORGE_RUNNER_TESTS=1 node --import tsx tests/runner.test.ts
 node --import tsx scripts/verify-content.ts
+node --import tsx scripts/verify-content.ts --course=cpp20
 ```
 
 The opt-in test compiles/runs valid C, invalid C, an infinite loop, output flood,
@@ -231,6 +232,7 @@ evidence they passed. The content verifier separately offers `--syntax-only`
 for trusted authored content and reports that execution remains unverified.
 
 For curriculum authoring, `node --import tsx scripts/verify-content.ts
+node --import tsx scripts/verify-content.ts --course=cpp20
 --trusted-authoring` links and executes only the finite, version-controlled
 ordinary examples and reference solutions on the authoring host, with bounded
 process/output/file limits. It does not read learner submissions and is never
@@ -245,7 +247,7 @@ fail-closed and requires the isolated toolchain.
 
 Private VPS Actions run38409763126 passed the real rootless preflight, operational
 suite, ASan/UBSan probes and149 ordinary curriculum/reference checks on Ubuntu
-ARM64/Podman3.4.4/GCC14.2.0. Through the then-private ChatGPT Site, real Run,
+ARM64/Podman3.4.4/GCC14.2.0. Through the then-private hosted Site, real Run,
 Check, wrong-output rejection and GCC compilation failure additionally passed.
 The API and isolated worker restarted and remained available with restored data.
 The workspace test suite still skips native execution because it lacks that

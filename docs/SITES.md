@@ -1,4 +1,4 @@
-# Public ChatGPT Site and learner accounts
+# Public hosted Site and learner accounts
 
 Site: https://c-forge-workshop.tahuna-2388.chatgpt.site. Its existing project ID
 stays in `.openai/hosting.json`; the release retains the original source/site.
@@ -11,7 +11,7 @@ transactions, saved work and native execution were retained.
 
 C Forge account sessions own learner data. Public registration assigns random
 UUIDs, initializes independent preferences/progress and never grants admin rights.
-No platform identity is fabricated or used to claim a learner account. ChatGPT
+No platform identity is fabricated or used to claim a learner account. platform
 visitor headers do not authorize administrator setup. The Worker rejects
 `/api/auth/setup` unconditionally; its old bootstrap secret binding is removed.
 

@@ -18,12 +18,14 @@
     "format:check": "prettier --check src server shared runner tests scripts content/*.json playwright*.config.ts",
     "dev:api": "node --env-file-if-exists=.env --import tsx --watch server/index.ts",
     "dev:web": "vite --host 0.0.0.0",
-    "lint": "eslint src server shared runner tests scripts vite.config.ts playwright.config.ts playwright.https.config.ts playwright.subpath.config.ts playwright.multi.config.ts",
+    "lint": "eslint src server shared runner tests scripts vite.config.ts playwright.config.ts playwright.https.config.ts playwright.subpath.config.ts playwright.multi.config.ts playwright.courses.config.ts",
     "test:https": "playwright test --config playwright.https.config.ts",
     "test:docker": "node --import tsx scripts/docker-smoke.ts",
     "test:subpath": "playwright test --config playwright.subpath.config.ts",
     "build:site": "npm run build && node scripts/embed-frontend.mjs && bash scripts/build.sh && node scripts/validate-artifact.mjs",
-    "test:multi-user": "playwright test --config playwright.multi.config.ts"
+    "test:multi-user": "playwright test --config playwright.multi.config.ts",
+    "test:courses": "playwright test --config playwright.courses.config.ts",
+    "preview": "npm run build && npm start"
   },
   "engines": {
     "node": ">=24"

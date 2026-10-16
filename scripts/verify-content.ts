@@ -4,16 +4,24 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { Case, Curriculum, SourceFiles } from "../shared/content.js";
 import type { RunnerOutcome, RunnerRequest } from "../shared/runner.js";
-import { COMPILER_FLAGS, PodmanRunner } from "../runner/podman.js";
+import { compilerFor, PodmanRunner } from "../runner/podman.js";
 import { executeProcess } from "../runner/process.js";
 import { LIMITS, matchesOutput, validateFiles } from "../runner/validation.js";
 
+const cppCourse = process.argv.includes("--course=cpp20");
+const compiler = compilerFor(cppCourse ? "cpp" : "c");
+const harnessName = `__forge_harness${compiler.extension}`;
 const syntaxOnly = process.argv.includes("--syntax-only");
 const trustedAuthoring = process.argv.includes("--trusted-authoring");
 if (
   process.argv
     .slice(2)
-    .some((arg) => !["--syntax-only", "--trusted-authoring"].includes(arg))
+    .some(
+      (arg) =>
+        !["--syntax-only", "--trusted-authoring", "--course=cpp20"].includes(
+          arg,
+        ),
+    )
 )
   throw new Error(
     "Supported options: --syntax-only or --trusted-authoring. Content source is fixed to the version-controlled curriculum.",
@@ -22,7 +30,12 @@ if (syntaxOnly && trustedAuthoring)
   throw new Error("Choose one verification mode.");
 const curriculum = JSON.parse(
   await readFile(
-    new URL("../content/curriculum.json", import.meta.url),
+    new URL(
+      cppCourse
+        ? "../content/cpp-curriculum.json"
+        : "../content/curriculum.json",
+      import.meta.url,
+    ),
     "utf8",
   ),
 ) as Curriculum;
@@ -46,18 +59,18 @@ async function stage(files: SourceFiles, path: string) {
     await writeFile(join(path, name), code, { mode: 0o600, flag: "wx" });
 }
 async function syntax(label: string, files: SourceFiles, harness?: string) {
-  validateFiles(files);
+  validateFiles(files, false, cppCourse ? "cpp" : "c");
   const path = join(root, `syntax-${syntaxChecks++}`);
   await stage(files, path);
   if (harness)
-    await writeFile(join(path, "__forge_harness.c"), harness, { mode: 0o600 });
+    await writeFile(join(path, harnessName), harness, { mode: 0o600 });
   const names = Object.keys(files)
-    .filter((name) => name.endsWith(".c"))
+    .filter((name) => name.endsWith(compiler.extension))
     .map((name) => join(path, name));
-  if (harness) names.push(join(path, "__forge_harness.c"));
+  if (harness) names.push(join(path, harnessName));
   const result = await executeProcess(
-    "gcc",
-    [...COMPILER_FLAGS, "-fsyntax-only", `-I${path}`, ...names],
+    compiler.command,
+    [...compiler.flags, "-fsyntax-only", `-I${path}`, ...names],
     { timeoutMs: 15000, maxBytes: 65536, env: cleanEnv },
   );
   if (result.code !== 0 || result.timedOut || result.truncated) {
@@ -74,7 +87,10 @@ async function add(label: string, request: RunnerRequest) {
   );
   for (const harness of harnesses)
     await syntax(label, request.files, harness || undefined);
-  pending.push({ label, request });
+  pending.push({
+    label,
+    request: { ...request, language: cppCourse ? "cpp" : "c" },
+  });
 }
 
 /** Explicitly trusted, finite authored content only; NOT a sandbox or app runner. */
@@ -94,17 +110,17 @@ async function executeTrusted(request: RunnerRequest): Promise<RunnerOutcome> {
       const source = join(path, `source-${index}`);
       await stage(request.files, source);
       if (harness)
-        await writeFile(join(source, "__forge_harness.c"), harness, {
+        await writeFile(join(source, harnessName), harness, {
           mode: 0o600,
         });
       executable = join(source, "trusted-reference");
       const names = Object.keys(request.files)
-        .filter((name) => name.endsWith(".c"))
+        .filter((name) => name.endsWith(compiler.extension))
         .map((name) => join(source, name));
-      if (harness) names.push(join(source, "__forge_harness.c"));
+      if (harness) names.push(join(source, harnessName));
       const built = await executeProcess(
-        "gcc",
-        [...COMPILER_FLAGS, `-I${source}`, ...names, "-o", executable, "-lm"],
+        compiler.command,
+        [...compiler.flags, `-I${source}`, ...names, "-o", executable, "-lm"],
         { timeoutMs: 15000, maxBytes: 65536, env: cleanEnv },
       );
       elapsed += built.elapsedMs;
@@ -262,7 +278,7 @@ try {
     });
   }
   console.log(
-    `Trusted C17 syntax: ${syntaxChecks} checks; textual contracts: ${textChecks}; failures: ${failures}; deliberately broken examples excluded: ${deliberatelyBroken}. No learner code was read.`,
+    `Trusted ${curriculum.course.standard} syntax: ${syntaxChecks} checks; textual contracts: ${textChecks}; failures: ${failures}; deliberately broken examples excluded: ${deliberatelyBroken}. No learner code was read.`,
   );
   if (syntaxOnly) {
     console.log(

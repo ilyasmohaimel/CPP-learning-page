@@ -1,0 +1,128 @@
+{
+  "version": 1,
+  "course": "cpp20",
+  "policy": "C++20 core course. Four substantive lessons and one checkpoint per module. Stable prefixed IDs preserve C17 work.",
+  "modules": [
+    {
+      "id": "cpp-first-programs",
+      "title": "First C++ programs",
+      "lessons": [
+        "cpp-source-and-output",
+        "cpp-values-and-initialization",
+        "cpp-arithmetic-and-conversion",
+        "cpp-first-programs-checkpoint"
+      ]
+    },
+    {
+      "id": "cpp-control",
+      "title": "Input and control flow",
+      "lessons": [
+        "cpp-checked-input",
+        "cpp-branches-and-bool",
+        "cpp-bounded-loops",
+        "cpp-control-checkpoint"
+      ]
+    },
+    {
+      "id": "cpp-functions",
+      "title": "Functions and references",
+      "lessons": [
+        "cpp-function-values",
+        "cpp-reference-parameters",
+        "cpp-overloads-and-scope",
+        "cpp-functions-checkpoint"
+      ]
+    },
+    {
+      "id": "cpp-sequences",
+      "title": "Strings and sequences",
+      "lessons": [
+        "cpp-strings-and-lines",
+        "cpp-vectors-and-bounds",
+        "cpp-arrays-and-spans",
+        "cpp-sequences-checkpoint"
+      ]
+    },
+    {
+      "id": "cpp-algorithms",
+      "title": "Algorithms and associative containers",
+      "lessons": [
+        "cpp-sorting-and-ranges",
+        "cpp-search-and-iterators",
+        "cpp-maps-and-counting",
+        "cpp-algorithms-checkpoint"
+      ]
+    },
+    {
+      "id": "cpp-types",
+      "title": "Records and classes",
+      "lessons": [
+        "cpp-records-and-enums",
+        "cpp-classes-and-invariants",
+        "cpp-construction-and-raii",
+        "cpp-types-checkpoint"
+      ]
+    },
+    {
+      "id": "cpp-ownership",
+      "title": "Ownership and lifetime",
+      "lessons": [
+        "cpp-pointers-and-null",
+        "cpp-unique-ownership",
+        "cpp-shared-and-weak",
+        "cpp-ownership-checkpoint"
+      ]
+    },
+    {
+      "id": "cpp-generic",
+      "title": "Templates and compile-time rules",
+      "lessons": [
+        "cpp-function-templates",
+        "cpp-class-templates",
+        "cpp-concepts-and-constexpr",
+        "cpp-generic-checkpoint"
+      ]
+    },
+    {
+      "id": "cpp-errors",
+      "title": "Errors and validated input",
+      "lessons": [
+        "cpp-optional-results",
+        "cpp-exceptions-and-cleanup",
+        "cpp-line-parsing",
+        "cpp-errors-checkpoint"
+      ]
+    },
+    {
+      "id": "cpp-files",
+      "title": "Files and program structure",
+      "lessons": [
+        "cpp-file-streams",
+        "cpp-headers-and-linking",
+        "cpp-namespaces-and-odr",
+        "cpp-files-checkpoint"
+      ]
+    },
+    {
+      "id": "cpp-abstraction",
+      "title": "Modern abstraction",
+      "lessons": [
+        "cpp-lambdas-and-views",
+        "cpp-move-semantics",
+        "cpp-virtual-interfaces",
+        "cpp-abstraction-checkpoint"
+      ]
+    },
+    {
+      "id": "cpp-debugging",
+      "title": "Debugging, tests and integration",
+      "lessons": [
+        "cpp-diagnostics-and-bounds",
+        "cpp-tests-and-invariants",
+        "cpp-complexity-and-choice",
+        "cpp-integration-checkpoint"
+      ]
+    }
+  ],
+  "projects": ["cpp-number-toolkit", "cpp-word-index", "cpp-gradebook"]
+}

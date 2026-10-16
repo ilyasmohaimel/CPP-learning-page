@@ -64,7 +64,7 @@ const rules: [RegExp, DiagnosticHelp][] = [
     {
       title: "A signed calculation exceeded its range.",
       explanation:
-        "Signed overflow is undefined behavior in C. Check bounds before performing the calculation.",
+        "Signed overflow is undefined behavior in C and C++. Check bounds before performing the calculation.",
     },
   ],
 ];

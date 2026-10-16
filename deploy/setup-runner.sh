@@ -320,6 +320,8 @@ step isolated-operational-tests 210 user_job tests 180 /usr/bin/env CFORGE_RUNNE
   "$CFORGE_NODE" --env-file="$CFORGE_CANDIDATE" --import tsx tests/runner.test.ts
 step isolated-curriculum-verification 1230 user_job curriculum 1200 "$CFORGE_NODE" \
   --env-file="$CFORGE_CANDIDATE" --import tsx scripts/verify-content.ts
+step isolated-cpp-curriculum-verification 1230 user_job curriculum-cpp 1200 "$CFORGE_NODE" \
+  --env-file="$CFORGE_CANDIDATE" --import tsx scripts/verify-content.ts --course=cpp20
 
 CFORGE_STEP=install-verified-worker
 no_symlinks "$CFORGE_USER_HOME/.config/systemd/user/c-forge-runner.service"

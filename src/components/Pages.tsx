@@ -237,7 +237,7 @@ export function HomePage({ course, state }: PageProps) {
             <span className="section-label">
               {state.resume ? "Continue learning" : "Your first lesson"}
             </span>
-            <span className="course-standard">C17</span>
+            <span className="course-standard">{course.course.standard}</span>
           </div>
           <div className="continue-content">
             <div className="continue-art" aria-hidden="true">
@@ -281,8 +281,8 @@ export function HomePage({ course, state }: PageProps) {
               ) : (
                 <p className="resume-position">
                   <Clock3 size={15} aria-hidden="true" />
-                  About {resumeLesson?.minutes ?? 8} minutes · no prior C
-                  knowledge needed
+                  About {resumeLesson?.minutes ?? 8} minutes · no prior{" "}
+                  {course.course.id === "cpp20" ? "C++" : "C"} knowledge needed
                 </p>
               )}
               {resumeLesson ? (
@@ -352,8 +352,10 @@ export function HomePage({ course, state }: PageProps) {
           </div>
           <p className="muted">
             {course.lessons.length} focused lessons, {course.modules.length}{" "}
-            ordered chapters, {course.projects.length} guided projects. C and
-            C++ are separate languages; this course teaches C.
+            ordered chapters, {course.projects.length} guided projects.
+            {course.course.id === "cpp20"
+              ? " Learn modern C++ through owning values, standard containers and explicit lifetimes."
+              : " Learn C through small programs, memory reasoning and active practice."}
           </p>
           <ol className="chapter-preview-list">
             {course.modules.slice(0, 4).map((module, i) => (
@@ -479,7 +481,7 @@ export function PathPage({ course, state }: PageProps) {
   const diagnostic = useQuery({
     queryKey: ["diagnostic", getLocalOwner()],
     queryFn: () => api<Diagnostic>("/api/diagnostic"),
-    enabled: showDiagnostic,
+    enabled: showDiagnostic && course.course.id === "c17",
   });
   async function submitDiagnostic(event: React.FormEvent) {
     event.preventDefault();
@@ -504,7 +506,7 @@ export function PathPage({ course, state }: PageProps) {
   return (
     <div className="page academy-page">
       <PageHeading
-        eyebrow="THE C17 COURSE"
+        eyebrow={`${course.course.standard} course`}
         title="One clear path. Your own pace."
         description="Build each idea on the last. Preview any lesson, revisit an old one, or start where your experience fits."
         icon={BookOpen}
@@ -526,13 +528,14 @@ export function PathPage({ course, state }: PageProps) {
         </div>
         <button
           className="button secondary small"
+          hidden={course.course.id !== "c17"}
           onClick={() => setShowDiagnostic((value) => !value)}
         >
           <ListChecks size={16} aria-hidden="true" />
           {showDiagnostic ? "Close diagnostic" : "Already know some C?"}
         </button>
       </div>
-      {showDiagnostic ? (
+      {showDiagnostic && course.course.id === "c17" ? (
         <section
           className="panel diagnostic-panel"
           aria-labelledby="diagnostic-heading"
@@ -703,7 +706,7 @@ export function PathPage({ course, state }: PageProps) {
                                     </Link>
                                   </span>
                                 ))
-                              : "No prior C knowledge. We start with source files and a first program."}
+                              : `No prior ${course.course.id === "cpp20" ? "C++" : "C"} knowledge. Start with source files and a first program.`}
                           </p>
                         </details>
                       </div>
@@ -743,8 +746,9 @@ export function PathPage({ course, state }: PageProps) {
         })}
       </div>
       <p className="notice">
-        C17 is the deliberate baseline, not the latest C standard. Later notes
-        may describe C23 features. This course never blends C with C++ syntax.
+        {course.course.id === "cpp20"
+          ? "C++20 is this course's baseline. Start without C prerequisites and build through containers, ownership, generic code, file handling and complete projects."
+          : "C17 is the deliberate baseline, not the latest C standard. Later notes may describe C23 features. C and C++ have separate language rules."}
       </p>
     </div>
   );
@@ -1206,7 +1210,7 @@ export function ProjectsPage({ course, state }: PageProps) {
               </ul>
               <p className="muted">
                 Passing tests is evidence about tested behavior. It does not
-                prove a C program correct for every input.
+                prove a program correct for every input.
               </p>
             </section>
             <section className="panel">
@@ -1321,13 +1325,15 @@ export function ProjectsPage({ course, state }: PageProps) {
   );
 }
 
-export function ReferencePage(_props: Partial<PageProps>) {
+export function ReferencePage({ course }: Partial<PageProps>) {
   const [search, setSearch] = useState("");
   const query = useDeferredValue(search);
   const reference = useQuery({
-    queryKey: ["reference", query, getLocalOwner()],
+    queryKey: ["reference", course?.course.id, query, getLocalOwner()],
     queryFn: () =>
-      api<Reference[]>(`/api/reference?q=${encodeURIComponent(query)}`),
+      api<Reference[]>(
+        `/api/reference?course=${course?.course.id ?? "c17"}&q=${encodeURIComponent(query)}`,
+      ),
   });
   return (
     <div className="page academy-page reference-page">
@@ -1344,7 +1350,11 @@ export function ReferencePage(_props: Partial<PageProps>) {
           type="search"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
-          placeholder="Search pointers, printf, bounds, compiler errors…"
+          placeholder={
+            course?.course.id === "cpp20"
+              ? "Search vectors, ownership, templates, streams…"
+              : "Search pointers, printf, bounds, compiler errors…"
+          }
         />
         <span className="sr-only">Search reference entries</span>
       </label>

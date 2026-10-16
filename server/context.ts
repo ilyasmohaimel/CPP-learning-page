@@ -5,6 +5,7 @@ export interface Context {
   app: FastifyInstance;
   store: Store;
   content: Curriculum;
+  courses: Curriculum[];
   exercise: (id: string) => Exercise;
   lesson: (id: string) => Lesson;
   bootstrapSecret: string;

@@ -1,8 +1,8 @@
 {
   "id": "./",
-  "name": "C Forge — Coding Workshop",
+  "name": "C Forge Coding Workshop",
   "short_name": "C Forge",
-  "description": "Learn C with focused lessons, persistent coding practice, and guided projects.",
+  "description": "Learn C and C++ with focused lessons, persistent coding practice, and guided projects.",
   "lang": "en",
   "start_url": "./",
   "scope": "./",

@@ -43,4 +43,4 @@ read-only health checks. No push-triggered deployment or cleanup remains active.
 The guarded fixture was cleared only when its unique identity still matched.
 Private Sites now authorizes real-user initial setup server-side; the bootstrap
 secret stays in native runtime secrets. The portable app's normal bootstrap form
-and administrator recovery remain available without ChatGPT/OAuth.
+and administrator recovery remain available without social sign-in.

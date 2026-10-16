@@ -1,4 +1,4 @@
-# Appearance and live-page review — 2026-10-16
+# Appearance and live-page review. 2026-10-16
 
 The public Site was inspected in cloud Chromium using a dedicated review
 account: home, learning path, projects/capstone, reference, settings and lesson

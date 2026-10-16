@@ -13,12 +13,14 @@ export const LIMITS = Object.freeze({
   sanitizedRunMs: 4000,
   jobMs: 100000,
 });
-const sourceName = /^(?:[A-Za-z][A-Za-z0-9_-]{0,63}\.(?:c|h|txt)|Makefile)$/;
+const sourceName =
+  /^(?:[A-Za-z][A-Za-z0-9_-]{0,63}\.(?:c|h|cpp|hpp|txt)|Makefile)$/;
 const fixtureName = /^[A-Za-z][A-Za-z0-9_.-]{0,63}$/;
 
 export function validateFiles(
   files: unknown,
   fixtures = false,
+  language: "c" | "cpp" = "c",
 ): asserts files is SourceFiles {
   if (!files || typeof files !== "object" || Array.isArray(files))
     throw new Error("Files must be an object.");
@@ -41,8 +43,17 @@ export function validateFiles(
   }
   if (bytes > (fixtures ? LIMITS.fixtureBytes : LIMITS.sourceBytes))
     throw new Error("Files exceed the size limit.");
-  if (!fixtures && !entries.some(([name]) => name.endsWith(".c")))
-    throw new Error("Include at least one .c source file.");
+  if (!fixtures) {
+    const extension = language === "cpp" ? ".cpp" : ".c";
+    if (!entries.some(([name]) => name.endsWith(extension)))
+      throw new Error(`Include at least one ${extension} source file.`);
+    if (
+      entries.some(([name]) =>
+        language === "c" ? /\.(cpp|hpp)$/.test(name) : name.endsWith(".c"),
+      )
+    )
+      throw new Error("Source files must match the exercise language.");
+  }
 }
 
 export function validateCase(value: unknown): asserts value is Case {
@@ -88,7 +99,9 @@ export function validateRequest(
   if (!value || typeof value !== "object")
     throw new Error("Invalid runner request.");
   const r = value as Partial<RunnerRequest>;
-  validateFiles(r.files);
+  if (r.language !== undefined && r.language !== "c" && r.language !== "cpp")
+    throw new Error("Unsupported language.");
+  validateFiles(r.files, false, r.language ?? "c");
   if (
     typeof r.stdin !== "string" ||
     Buffer.byteLength(r.stdin) > LIMITS.stdinBytes

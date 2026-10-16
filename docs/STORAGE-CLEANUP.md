@@ -1,4 +1,4 @@
-# VPS storage recovery — 13 October 2026
+# VPS storage recovery. 13 October 2026
 
 The full `/srv` volume was recovered on the Ubuntu VPS at `51.170.138.252`. At the first check it had **0 available bytes, 100% use**. After repair it showed **34% use and approximately 93 GiB available**. Personal cloud files, Immich photographs/videos, the live PostgreSQL data directory, Docker volumes/images, and other applications were preserved.
 

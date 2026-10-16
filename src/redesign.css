@@ -1115,3 +1115,64 @@ a:hover {
   flex: none;
   margin-bottom: 18px;
 }
+
+/* Account-saved course choice stays available beside the workspace controls. */
+.course-picker {
+  flex: 0 0 auto;
+}
+.course-picker select {
+  min-height: 38px;
+  width: 138px;
+  max-width: 138px;
+  padding: 6px 28px 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.course-picker select:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+}
+.course-picker select:disabled {
+  opacity: 0.65;
+}
+@media (max-width: 600px) {
+  .course-picker select {
+    width: 114px;
+    max-width: 114px;
+    padding-left: 8px;
+    font-size: 0.78rem;
+  }
+  .topbar-actions {
+    flex-shrink: 0;
+    gap: 6px;
+  }
+  .topbar-title > span {
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.language-logo.cpp-logo {
+  width: 46px;
+  font-size: 18px;
+}
+.language-logo.small.cpp-logo {
+  width: 36px;
+  font-size: 12px;
+}
+@media (max-width: 600px) {
+  .topbar-title {
+    flex: 1;
+  }
+  .topbar-title > span:first-of-type,
+  .topbar-title > svg {
+    display: none;
+  }
+}

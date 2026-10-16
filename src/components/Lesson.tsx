@@ -173,8 +173,11 @@ function Workspace({
     split = useRef<HTMLDivElement>(null),
     drag = useRef<{ x: number; start: number } | null>(null);
   const runner = useQuery({
-    queryKey: ["runner", getLocalOwner()],
-    queryFn: () => api<{ available: boolean; detail: string }>("/api/runner"),
+    queryKey: ["runner", course.course.id, getLocalOwner()],
+    queryFn: () =>
+      api<{ available: boolean; detail: string }>(
+        `/api/runner?course=${course.course.id}`,
+      ),
     refetchInterval: 15000,
   });
   const hints = useQuery({
@@ -452,15 +455,20 @@ function Workspace({
                   <p>{lesson.objective}</p>
                 </div>
               </div>
-              {lesson.id === "source-to-program" ? (
+              {lesson.id === "source-to-program" ||
+              lesson.id === "cpp-source-and-output" ? (
                 <div
                   className="compile-pipeline"
                   aria-label="Compilation and execution are separate steps"
                 >
                   <div>
                     <FileCode2 size={24} />
-                    <strong>main.c</strong>
-                    <small>C source text</small>
+                    <strong>
+                      {course.course.id === "cpp20" ? "main.cpp" : "main.c"}
+                    </strong>
+                    <small>
+                      {course.course.id === "cpp20" ? "C++" : "C"} source text
+                    </small>
                   </div>
                   <ArrowRight size={18} />
                   <div>
@@ -490,7 +498,9 @@ function Workspace({
                 <div className="section-bar">
                   <h3>Worked example</h3>
                   <span className="muted">
-                    {lesson.brokenExample ? "Intentionally broken" : "C17"}
+                    {lesson.brokenExample
+                      ? "Intentionally broken"
+                      : course.course.standard}
                   </span>
                 </div>
                 {Object.entries(lesson.workedExample).map(([name, code]) => (
@@ -648,9 +658,9 @@ function Workspace({
                   </div>
                 ))}
                 <p>
-                  Check includes additional cases. Output normalization changes
-                  CRLF line endings and removes one final newline. Spaces and
-                  internal blank lines matter.
+                  {conceptual
+                    ? "This check compares a short answer. Capitalization and extra whitespace are ignored. Use the wording requested in the question."
+                    : "Check includes additional cases. Output normalization changes CRLF line endings and removes one final newline. Spaces and internal blank lines matter."}
                 </p>
               </details>
               <div className="hint-section">
@@ -881,8 +891,15 @@ function Workspace({
             </div>
             <div className="editor-toolbar">
               <div>
-                <span className="language-logo small">C</span>
-                <span>C17 · GCC 14</span>
+                <span
+                  className={`language-logo small ${course.course.id === "cpp20" ? "cpp-logo" : ""}`}
+                >
+                  {course.course.id === "cpp20" ? "C++" : "C"}
+                </span>
+                <span>
+                  {course.course.standard} ·{" "}
+                  {course.course.id === "cpp20" ? "G++" : "GCC"} 14
+                </span>
               </div>
               <div>
                 <button
@@ -915,7 +932,7 @@ function Workspace({
               batch-based.
             </p>
           </div>
-          {project ? (
+          {project || Object.keys(exercise.starter).length > 1 ? (
             <details className="project-files">
               <summary>Manage project files</summary>
               <label>
@@ -923,19 +940,23 @@ function Workspace({
                 <input
                   value={newFile}
                   onChange={(e) => setNewFile(e.target.value)}
-                  placeholder="helper.c"
+                  placeholder={
+                    course.course.id === "cpp20" ? "helper.cpp" : "helper.c"
+                  }
                 />
               </label>
               <button
                 onClick={() => {
                   if (
-                    !/^[A-Za-z0-9][A-Za-z0-9_.-]*\.(c|h|txt)$/.test(newFile) ||
+                    !/^[A-Za-z0-9][A-Za-z0-9_.-]*\.(c|h|cpp|hpp|txt)$/.test(
+                      newFile,
+                    ) ||
                     newFile.includes("..") ||
                     Object.keys(data.files).length >= 12 ||
                     Object.hasOwn(data.files, newFile)
                   ) {
                     setError(
-                      "Use a unique simple .c, .h, or .txt filename. Limit: 12 files.",
+                      "Use a unique simple .c, .h, .cpp, .hpp, or .txt filename. Limit: 12 files.",
                     );
                     return;
                   }
@@ -977,6 +998,7 @@ function Workspace({
             </small>
           </details>
           <Results
+            standard={course.course.standard}
             job={shown ?? null}
             runner={runner.data}
             error={error}

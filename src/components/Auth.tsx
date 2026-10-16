@@ -139,15 +139,15 @@ export function Auth({ onSuccess }: { onSuccess: () => void }) {
         </div>
         <dl className="auth-course-facts" aria-label="Course contents">
           <div>
-            <dt>48</dt>
+            <dt>2</dt>
+            <dd>C and C++ courses</dd>
+          </div>
+          <div>
+            <dt>96</dt>
             <dd>focused lessons</dd>
           </div>
           <div>
-            <dt>105</dt>
-            <dd>exercises</dd>
-          </div>
-          <div>
-            <dt>3</dt>
+            <dt>6</dt>
             <dd>guided projects</dd>
           </div>
         </dl>

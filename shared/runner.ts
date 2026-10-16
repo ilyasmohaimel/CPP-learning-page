@@ -19,6 +19,7 @@ export interface ExecutionResult {
   signal?: string;
 }
 export interface RunnerRequest {
+  language?: import("./content.js").Language;
   files: SourceFiles;
   stdin: string;
   sanitize: boolean;

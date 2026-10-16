@@ -214,7 +214,7 @@ test("mocked orchestration grades raw output on worker side and distinguishes C 
       state.set(name, 0);
       return { ...ok, stdout: "c-forge-isolation-ok gcc-14.2.0\n" };
     }
-    if (args.includes("gcc")) {
+    if (args.includes("gcc") || args.includes("g++")) {
       const mount = args.find((a) => a.includes(":/build:"))!;
       await writeFile(
         join(mount.split(":/build:")[0], "main"),
@@ -235,6 +235,20 @@ test("mocked orchestration grades raw output on worker side and distinguishes C 
     true,
     "Podman 3.4 bare full image IDs remain valid",
   );
+  learnerOutput = "cpp-ok\n";
+  const cpp = await runner.execute({
+    language: "cpp",
+    files: { "main.cpp": "int main() {}" },
+    stdin: "",
+    sanitize: false,
+    cases: [{ stdin: "", expected: "cpp-ok\n", label: "C++ contract" }],
+  });
+  assert.equal(cpp.passed, true);
+  const cppCompile = calls.findLast((args) => args.includes("g++"))!;
+  assert(cppCompile.includes("-std=c++20"));
+  assert(cppCompile.includes("c++"));
+  assert(cppCompile.includes("/src/main.cpp"));
+  assert(!cppCompile.includes("-std=c17"));
   learnerOutput = "wrong\n";
   const statuses: string[] = [];
   const checked = await runner.execute(
@@ -302,6 +316,38 @@ test(
     const runner = new PodmanRunner({ image: process.env.RUNNER_IMAGE });
     const preflight = await runner.preflight();
     assert(preflight.available, preflight.detail);
+    const cpp = await runner.execute({
+      language: "cpp",
+      files: {
+        "main.cpp":
+          '#include <iostream>\nint main() { int n{}; std::cin >> n; std::cout << n * 2 << "\\n"; }',
+      },
+      stdin: "",
+      sanitize: false,
+      cases: [
+        { stdin: "4\n", expected: "8\n", label: "normal" },
+        { stdin: "-3\n", expected: "-6\n", label: "negative" },
+      ],
+    });
+    assert.equal(cpp.passed, true);
+    const cppInvalid = await runner.execute({
+      language: "cpp",
+      files: { "main.cpp": "int main() { invalid C++ }" },
+      stdin: "",
+      sanitize: false,
+    });
+    assert.equal(cppInvalid.state, "failed");
+    const cppBounds = await runner.execute({
+      language: "cpp",
+      files: {
+        "main.cpp":
+          "#include <cstddef>\nint main() { volatile std::size_t count = 1; int* values = new int[count]; values[count] = 7; delete[] values; }",
+      },
+      stdin: "",
+      sanitize: true,
+    });
+    assert.equal(cppBounds.state, "failed");
+    assert.match(cppBounds.stderr, /AddressSanitizer: heap-buffer-overflow/);
     const run = (source: string) =>
       runner.execute({
         files: { "main.c": source },

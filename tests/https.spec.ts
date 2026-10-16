@@ -143,7 +143,7 @@ test("phone installation metadata and all icons are served locally over HTTPS", 
   expect(response.ok()).toBe(true);
   const manifest = await response.json();
   expect(manifest).toMatchObject({
-    name: "C Forge — Coding Workshop",
+    name: "C Forge Coding Workshop",
     start_url: "./",
     scope: "./",
     display: "standalone",

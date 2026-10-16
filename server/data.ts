@@ -366,7 +366,7 @@ export function dataRoutes(ctx: Context, exportKey: string) {
           v.dueAt,
           trusted
             ? v.lastResult
-            : "Imported progress — run a new check to verify proficiency.",
+            : "Imported progress. Run a new check to verify proficiency.",
         );
       }
       for (const a of p.data.attempts) {

@@ -9,6 +9,7 @@ import { requireOwner, now, type Context, notFound } from "./context.js";
 import { safeEqual } from "./auth.js";
 import { rateLimit } from "./rate-limit.js";
 import { parse, files, outcome } from "./validation.js";
+import { validateFiles } from "../runner/validation.js";
 import { recordAttempt, normalizeAnswer } from "./learning.js";
 const terminal = new Set<JobState>([
   "succeeded",
@@ -30,19 +31,24 @@ interface JobRow {
   worker_id: string | null;
   cancelled: number;
 }
-export function runnerAvailability(ctx: Context) {
+export function runnerAvailability(ctx: Context, language: "c" | "cpp" = "c") {
   const w = ctx.store.get<{
     available: number;
     detail: string;
     heartbeat_at: string;
   }>("SELECT * FROM workers ORDER BY heartbeat_at DESC LIMIT 1");
+  const supported = language === "c" || !!w?.detail.includes("C++20");
   return {
     available:
-      !!w?.available && Date.parse(w.heartbeat_at) > Date.now() - 30000,
+      supported &&
+      !!w?.available &&
+      Date.parse(w.heartbeat_at) > Date.now() - 30000,
     detail:
-      w?.detail ??
-      "No isolated worker is connected. Drafts and lessons work; C execution requires the self-hosted rootless worker.",
-    toolchain: "GCC 14.2.0 · -std=c17",
+      !supported && w
+        ? "This worker has not verified C++20. Update and restart the isolated worker before running C++ exercises."
+        : (w?.detail ??
+          "No isolated worker is connected. Drafts and lessons work; C/C++ execution requires the self-hosted rootless worker."),
+    toolchain: "GCC 14.2.0 · C17 / C++20",
   };
 }
 export function expireJobs(ctx: Context) {
@@ -107,9 +113,9 @@ function finish(ctx: Context, j: JobRow, result: RunnerOutcome) {
 }
 export function jobRoutes(ctx: Context) {
   const { app, store } = ctx;
-  app.get("/api/runner", async (req) => {
+  app.get<{ Querystring: { course?: string } }>("/api/runner", async (req) => {
     requireOwner(req);
-    return runnerAvailability(ctx);
+    return runnerAvailability(ctx, req.query.course === "cpp20" ? "cpp" : "c");
   });
   app.post("/api/jobs", async (req, reply) => {
     const owner = requireOwner(req),
@@ -207,6 +213,12 @@ export function jobRoutes(ctx: Context) {
       });
       return { id, state: r.state, result: r };
     }
+    // Language belongs to the exercise contract, never to the browser payload.
+    try {
+      validateFiles(b.files, false, e.language ?? "c");
+    } catch (error) {
+      throw Object.assign(error as Error, { statusCode: 400 });
+    }
     if (req.accountRole === "learner") {
       expireJobs(ctx);
       const pending = store.get<{ n: number }>(
@@ -242,12 +254,12 @@ export function jobRoutes(ctx: Context) {
           { statusCode: 429 },
         );
     }
-    if (!runnerAvailability(ctx).available) {
+    if (!runnerAvailability(ctx, e.language ?? "c").available) {
       reply.code(503);
       return {
         error:
           "Runner unavailable. Your code is saved separately; this submission has not been run or graded.",
-        runner: runnerAvailability(ctx),
+        runner: runnerAvailability(ctx, e.language ?? "c"),
       };
     }
     expireJobs(ctx);
@@ -263,6 +275,7 @@ export function jobRoutes(ctx: Context) {
       );
     const id = randomUUID(),
       payload: RunnerRequest = {
+        language: e.language ?? "c",
         files: b.files,
         stdin: b.stdin,
         sanitize: b.sanitize,

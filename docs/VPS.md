@@ -6,7 +6,7 @@ TLS8445 service forwards the `/forge/` prefix. Existing SFTPGo routes remain at
 the root of that server. No firewall rule, VPN port, public IP, global Node
 installation, or other application gateway was replaced.
 
-The primary address is the public ChatGPT Site:
+The primary address is the public hosted Site:
 **https://c-forge-workshop.tahuna-2388.chatgpt.site**. Its same-origin API bridge
 connects to **https://c-forge.51.170.138.252.sslip.io:8445/forge/**.
 Both database routing and real native Run/Check passed through the actual Site.
@@ -65,7 +65,7 @@ sudo runuser -u cforge-runner -- env -C /opt/c-forge \
 
 Open the public Site and choose **Create account**. Each learner has their own
 username/password, drafts, progress and preferences. Sign into the same C Forge
-account on phone and Linux to retrieve acknowledged server saves. No ChatGPT
+account on phone and Linux to retrieve acknowledged server saves. No platform
 login, email or OAuth service is needed. The public Worker blocks administrator
 setup; platform visitor headers cannot grant administrator privileges.
 
