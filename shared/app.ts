@@ -6,6 +6,8 @@ import type {
   Reference,
 } from "./content.js";
 export interface Preferences {
+  displayName?: string;
+  avatarDataUrl?: string | null;
   courseId?: "c17" | "cpp20";
   theme: "dark" | "light" | "system";
   proseSize: number;

@@ -1,3 +1,23 @@
+# Sidebar, profiles and copy update, 2026-10-16
+
+Both courses are visible in the sidebar with local SVG logos and a selected
+state. The header dropdown is removed. The bottom-left profile opens a name and
+picture editor. Account preferences store the optional profile fields without a
+schema migration or changing login usernames. Pictures are cropped to 192px and
+bounded to 64 KB; external image URLs and SVG uploads are rejected.
+
+Checks: typecheck, lint, formatting, content audit and production build pass.
+Unit/integration tests report 57 passes and one local native skip. The 10 core
+browser journeys and two account/theme journeys pass. The two-course journey
+also passes desktop and phone sidebar switching, collapsed-logo visibility,
+canonical draft restoration, profile save/cancel, photo upload, fresh-login
+restoration and phone photo removal. Scoped accessibility scans report no
+violations; the profile and dashboard screenshots were visually inspected.
+
+Earlier publication and native-host evidence follows.
+
+---
+
 # Published C17 and C++20 workshop, 2026-10-16
 
 The primary workshop and the direct VPS application now run the C/C++ release

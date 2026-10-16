@@ -21,8 +21,63 @@ test("both courses preserve drafts, course choice and resume across switches and
     .getByRole("button", { name: "Create my workshop", exact: true })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Make something click." }),
+    page.getByRole("heading", { name: "Your workshop", exact: true }),
   ).toBeVisible();
+  const cChoice = page.getByRole("button", {
+    name: "C programming",
+    exact: true,
+  });
+  const cppChoice = page.getByRole("button", {
+    name: "C++ programming",
+    exact: true,
+  });
+  await expect(cChoice).toBeVisible();
+  await expect(cppChoice).toBeVisible();
+  await expect(cChoice).toHaveAttribute("aria-pressed", "true");
+  await expect(cppChoice).toHaveAttribute("aria-pressed", "false");
+  await page.getByRole("button", { name: "Edit profile", exact: true }).click();
+  const profile = page.getByRole("dialog", {
+    name: "Edit profile",
+    exact: true,
+  });
+  await profile
+    .getByLabel("Display name", { exact: true })
+    .fill("Workshop learner");
+  await profile
+    .getByLabel("Profile picture", { exact: true })
+    .setInputFiles("public/icons/forge-192.png");
+  await expect(profile.locator(".avatar img")).toBeVisible();
+  await mkdir("docs/screenshots", { recursive: true });
+  await page.screenshot({
+    path: "docs/screenshots/preview-profile.png",
+    animations: "disabled",
+  });
+  expect(
+    (
+      await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+        .analyze()
+    ).violations,
+  ).toEqual([]);
+  await profile
+    .getByRole("button", { name: "Save profile", exact: true })
+    .click();
+  await expect(profile).toBeHidden();
+  await expect(page.locator(".profile-trigger strong")).toHaveText(
+    "Workshop learner",
+  );
+  await expect(page.locator(".profile-trigger img")).toHaveAttribute(
+    "src",
+    /^data:image\/webp;base64,/,
+  );
+  await page.getByRole("button", { name: "Edit profile", exact: true }).click();
+  await profile
+    .getByLabel("Display name", { exact: true })
+    .fill("Unsaved name");
+  await profile.getByRole("button", { name: "Close", exact: true }).click();
+  await expect(page.locator(".profile-trigger strong")).toHaveText(
+    "Workshop learner",
+  );
   const identity = await (await page.request.get("/api/auth/me")).json();
   async function editAndVerify(exercise: string, code: string) {
     const editor = page.getByLabel("Source code editor");
@@ -40,22 +95,16 @@ test("both courses preserve drafts, course choice and resume across switches and
       })
       .toBe(code);
   }
-  await page
-    .getByRole("combobox", { name: "Course", exact: true })
-    .selectOption("c17");
   await page.goto(
     "/lesson/source-to-program?exercise=source-to-program-guided",
   );
   const cCode =
     '#include <stdio.h>\n\nint main(void) {\n    puts("My C draft");\n    return 0;\n}\n';
   await editAndVerify("source-to-program-guided", cCode);
-  await page
-    .getByRole("combobox", { name: "Course", exact: true })
-    .selectOption("cpp20");
+  await expect(cppChoice).toBeVisible();
+  await cppChoice.click();
   await expect(page).toHaveURL(/\/$/);
-  await expect(
-    page.getByRole("combobox", { name: "Course", exact: true }),
-  ).toHaveValue("cpp20");
+  await expect(cppChoice).toHaveAttribute("aria-pressed", "true");
   await page.getByRole("link", { name: "Learning path", exact: true }).click();
   await expect(
     page.getByRole("button", { name: "Already know some C?" }),
@@ -73,6 +122,18 @@ test("both courses preserve drafts, course choice and resume across switches and
   const cppCode =
     '#include <iostream>\n\nint main() {\n    std::cout << "Hello, workshop!\\n";\n}\n';
   await editAndVerify("cpp-source-and-output-guided", cppCode);
+  await expect(cChoice).toBeVisible();
+  await expect(cppChoice).toHaveAttribute("aria-pressed", "true");
+  await page
+    .getByRole("button", { name: "Collapse navigation", exact: true })
+    .click();
+  await expect(cChoice).toBeVisible();
+  await expect(cppChoice).toBeVisible();
+  await expect(cChoice.locator(".language-logo")).toBeVisible();
+  await expect(cppChoice.locator(".language-logo")).toBeVisible();
+  await page
+    .getByRole("button", { name: "Expand navigation", exact: true })
+    .click();
   await expect(page.locator(".editor-toolbar")).toContainText("C++20");
   await expect(
     page.getByRole("button", { name: "main.cpp", exact: true }),
@@ -103,11 +164,9 @@ test("both courses preserve drafts, course choice and resume across switches and
       () => document.documentElement.scrollWidth <= innerWidth + 1,
     ),
   ).toBe(true);
-  expect(
-    await page
-      .getByRole("combobox", { name: "Course", exact: true })
-      .evaluate((select) => select.getBoundingClientRect().width),
-  ).toBeGreaterThanOrEqual(110);
+  await expect(
+    page.getByRole("combobox", { name: "Course", exact: true }),
+  ).toHaveCount(0);
   await page.screenshot({
     path: "docs/screenshots/preview-mobile.png",
     animations: "disabled",
@@ -130,12 +189,46 @@ test("both courses preserve drafts, course choice and resume across switches and
     .getByRole("button", { name: "Continue learning", exact: true })
     .click();
   await expect(
-    other.getByRole("combobox", { name: "Course", exact: true }),
-  ).toHaveValue("cpp20");
+    other.getByRole("button", { name: "C++ programming", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await expect(other.locator(".profile-trigger strong")).toHaveText(
+    "Workshop learner",
+  );
+  await expect(other.locator(".profile-trigger img")).toHaveAttribute(
+    "src",
+    /^data:image\/webp;base64,/,
+  );
   await other.getByRole("link", { name: "Resume lesson", exact: true }).click();
   await expect(other.getByLabel("Source code editor")).toContainText(
     "Hello, workshop!",
   );
+  await other.setViewportSize({ width: 390, height: 844 });
+  await other
+    .getByRole("button", { name: "Open navigation", exact: true })
+    .click();
+  await other
+    .getByRole("button", { name: "Edit profile", exact: true })
+    .click();
+  const mobileProfile = other.getByRole("dialog", {
+    name: "Edit profile",
+    exact: true,
+  });
+  await expect(
+    mobileProfile.getByLabel("Display name", { exact: true }),
+  ).toHaveValue("Workshop learner");
+  expect(
+    await other.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth + 1,
+    ),
+  ).toBe(true);
+  await mobileProfile
+    .getByRole("button", { name: "Remove picture", exact: true })
+    .click();
+  await mobileProfile
+    .getByRole("button", { name: "Save profile", exact: true })
+    .click();
+  await expect(mobileProfile).toBeHidden();
+  await expect(other.locator(".profile-trigger img")).toHaveCount(0);
   await fresh.close();
   await page.goto(
     "/lesson/cpp-source-and-output?exercise=cpp-source-and-output-independent",
@@ -144,9 +237,17 @@ test("both courses preserve drafts, course choice and resume across switches and
   await page.getByRole("button", { name: "Check", exact: true }).click();
   await expect(page.locator(".result-feedback")).toContainText("Check passed");
 
+  await page.setViewportSize({ width: 390, height: 844 });
   await page
-    .getByRole("combobox", { name: "Course", exact: true })
-    .selectOption("c17");
+    .getByRole("button", { name: "Open navigation", exact: true })
+    .click();
+  await expect(cChoice).toBeVisible();
+  await expect(cppChoice).toBeVisible();
+  await expect(cppChoice).toHaveAttribute("aria-pressed", "true");
+  await cChoice.press("Enter");
+  await expect(
+    page.getByRole("button", { name: "Open navigation", exact: true }),
+  ).toHaveAttribute("aria-expanded", "false");
   await expect(
     page.getByRole("link", { name: "Resume lesson", exact: true }),
   ).toHaveAttribute("href", /source-to-program/);

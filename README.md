@@ -2,7 +2,7 @@
   <img src="public/favicon.svg" alt="" width="76" height="76" />
   <h1>C Forge</h1>
   <p>A coding workshop for learning C and modern C++.</p>
-  <p>Read a short lesson. Write a program. Test your understanding.</p>
+  <p>C17 and C++20 courses with an editor, checks and saved progress.</p>
   <p><a href="https://c-forge-workshop.tahuna-2388.chatgpt.site">Open the workshop</a> · <a href="https://c-forge.51.170.138.252.sslip.io:8445/forge/">Direct server</a> · <a href="#run-locally">Run locally</a> · <a href="docs/CURRICULUM.md">C course</a> · <a href="docs/CPP-COURSE.md">C++ course</a></p>
 </div>
 
@@ -20,8 +20,8 @@
 | Guided projects | 3 | 3 |
 | Reference entries | 39 | 48 |
 
-Start either course without prior programming knowledge. Switch courses from the
-header; each keeps its own drafts, progress, reviews and resume position. The
+Start either course without prior programming knowledge. Choose C or C++ in the
+sidebar; each keeps its own drafts, progress, reviews and resume position. The
 course choice and reading preferences are saved to your account.
 
 **C** covers first programs, control flow, functions, arrays, strings, pointers,
@@ -47,13 +47,15 @@ C and C++ have separate language rules, file types and compiler settings.
 - **A comfortable reading setup.** Light and dark themes, adjustable text sizes,
   line spacing, reduced motion and a focused lesson view.
 - **Your own account.** Separate learner data, portable exports and import previews.
-  No email or social account is required.
+  Click your profile to set a display name and picture. No email or social account
+  is required.
 
 <details>
 <summary>More screenshots</summary>
 
 ![Learning dashboard](docs/screenshots/preview-home.png)
 ![C++ editor on a phone-sized screen](docs/screenshots/preview-mobile.png)
+![Profile editor](docs/screenshots/preview-profile.png)
 
 </details>
 

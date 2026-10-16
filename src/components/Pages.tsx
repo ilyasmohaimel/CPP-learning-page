@@ -157,7 +157,7 @@ function PageHeading({
 }: {
   eyebrow: string;
   title: string;
-  description: string;
+  description?: string;
   icon: typeof BookOpen;
 }) {
   return (
@@ -168,7 +168,7 @@ function PageHeading({
           <Icon size={25} strokeWidth={1.5} />
         </span>
       </div>
-      <p className="muted">{description}</p>
+      {description ? <p className="muted">{description}</p> : null}
     </header>
   );
 }
@@ -225,12 +225,7 @@ export function HomePage({ course, state }: PageProps) {
   }
   return (
     <div className="page academy-page">
-      <PageHeading
-        eyebrow="YOUR WORKSHOP"
-        title="Make something click."
-        description="A little understanding. A little practice. Pick up exactly where you left off."
-        icon={Code2}
-      />
+      <PageHeading eyebrow="YOUR WORKSHOP" title="Your workshop" icon={Code2} />
       <div className="home-primary">
         <section className="continue-card" aria-labelledby="continue-heading">
           <div className="continue-topline">
@@ -311,12 +306,8 @@ export function HomePage({ course, state }: PageProps) {
           className="panel session-panel"
           aria-labelledby="session-heading"
         >
-          <h2 id="session-heading">
-            Your {state.preferences.sessionMinutes}-minute session
-          </h2>
-          <p className="muted">
-            A suggestion, never a countdown. Stop whenever you need to.
-          </p>
+          <h2 id="session-heading">Suggested session</h2>
+          <p className="muted">About {effort} minutes</p>
           <ol className="session-list">
             {sessionLessons.map((lesson, index) => (
               <li key={lesson.id}>
@@ -329,7 +320,7 @@ export function HomePage({ course, state }: PageProps) {
             ))}
           </ol>
           <Link className="text-link" to="/settings">
-            Change your session preference
+            Session settings
             <ArrowRight size={14} aria-hidden="true" />
           </Link>
         </aside>
@@ -341,9 +332,7 @@ export function HomePage({ course, state }: PageProps) {
         >
           <div className="section-top">
             <div>
-              <h2 id="path-preview-heading">
-                From your first line to a useful CLI.
-              </h2>
+              <h2 id="path-preview-heading">Course overview</h2>
             </div>
             <Link className="text-link" to="/path">
               All chapters
@@ -351,11 +340,8 @@ export function HomePage({ course, state }: PageProps) {
             </Link>
           </div>
           <p className="muted">
-            {course.lessons.length} focused lessons, {course.modules.length}{" "}
-            ordered chapters, {course.projects.length} guided projects.
-            {course.course.id === "cpp20"
-              ? " Learn modern C++ through owning values, standard containers and explicit lifetimes."
-              : " Learn C through small programs, memory reasoning and active practice."}
+            {course.lessons.length} lessons · {course.modules.length} chapters ·{" "}
+            {course.projects.length} projects
           </p>
           <ol className="chapter-preview-list">
             {course.modules.slice(0, 4).map((module, i) => (
@@ -379,28 +365,23 @@ export function HomePage({ course, state }: PageProps) {
               demonstrated independently. Completion and proficiency are tracked
               separately.
             </p>
-          ) : (
-            <p className="progress-explanation">
-              Your progress starts with your first checked exercise. Nothing to
-              catch up on.
-            </p>
-          )}
+          ) : null}
         </section>
         <div className="home-side-stack">
           <section className="panel" aria-labelledby="review-summary-heading">
             <div className="panel-icon">
               <RotateCcw size={19} aria-hidden="true" />
             </div>
-            <h2 id="review-summary-heading">Keep it familiar.</h2>
+            <h2 id="review-summary-heading">Review</h2>
             <p className="muted">
               {due.length
-                ? `${due.length} retrieval ${due.length === 1 ? "question is" : "questions are"} ready to revisit. Short reviews help you check what you still remember.`
+                ? `${due.length} ${due.length === 1 ? "question" : "questions"} due.`
                 : state.reviews.length
-                  ? "Your next review is scheduled. You can revisit a concept whenever you want."
-                  : "After a checked exercise, a short retrieval question will appear here."}
+                  ? "Next review scheduled."
+                  : "No reviews yet."}
             </p>
             <Link className="text-link" to="/review">
-              {due.length ? "Start a short review" : "Open practice & review"}
+              {due.length ? "Start review" : "Practice & review"}
               <ArrowRight size={16} aria-hidden="true" />
             </Link>
           </section>
@@ -457,9 +438,7 @@ export function HomePage({ course, state }: PageProps) {
                 })}
               </ul>
             ) : (
-              <p className="muted">
-                No attempts yet. Runs and checks will appear here as you work.
-              </p>
+              <p className="muted">No runs or checks yet.</p>
             )}
           </section>
         </div>
@@ -507,8 +486,7 @@ export function PathPage({ course, state }: PageProps) {
     <div className="page academy-page">
       <PageHeading
         eyebrow={`${course.course.standard} course`}
-        title="One clear path. Your own pace."
-        description="Build each idea on the last. Preview any lesson, revisit an old one, or start where your experience fits."
+        title="Learning path"
         icon={BookOpen}
       />
       <div className="path-intro">
@@ -526,14 +504,15 @@ export function PathPage({ course, state }: PageProps) {
             <strong>{done.size}</strong> lessons completed
           </span>
         </div>
-        <button
-          className="button secondary small"
-          hidden={course.course.id !== "c17"}
-          onClick={() => setShowDiagnostic((value) => !value)}
-        >
-          <ListChecks size={16} aria-hidden="true" />
-          {showDiagnostic ? "Close diagnostic" : "Already know some C?"}
-        </button>
+        {course.course.id === "c17" ? (
+          <button
+            className="button secondary small"
+            onClick={() => setShowDiagnostic((value) => !value)}
+          >
+            <ListChecks size={16} aria-hidden="true" />
+            {showDiagnostic ? "Close diagnostic" : "Already know some C?"}
+          </button>
+        ) : null}
       </div>
       {showDiagnostic && course.course.id === "c17" ? (
         <section
@@ -897,8 +876,7 @@ export function ReviewPage({ course, state, onRefresh }: PageProps) {
     <div className="page academy-page">
       <PageHeading
         eyebrow="PRACTICE & REVIEW"
-        title="Make the ideas yours."
-        description="Recall a concept without looking, then use it again. A mistake points to a next step; it is not a penalty."
+        title="Practice & review"
         icon={RotateCcw}
       />
       <div className="review-layout">
@@ -930,14 +908,12 @@ export function ReviewPage({ course, state, onRefresh }: PageProps) {
             <div className="panel empty-state">
               <CheckCircle2 size={30} aria-hidden="true" />
               <h2>
-                {state.reviews.length
-                  ? "Nothing due right now."
-                  : "Your first review is ahead."}
+                {state.reviews.length ? "No reviews due." : "No reviews yet."}
               </h2>
               <p>
                 {state.reviews.length
-                  ? "You can choose a practice item below, or return to your next lesson."
-                  : "Finish a checked exercise to schedule its retrieval question. Your first session can be just one lesson."}
+                  ? "Practice an exercise below or continue a lesson."
+                  : "Complete an exercise check to add its review."}
               </p>
               <Link className="button secondary" to="/path">
                 Choose a lesson
@@ -947,7 +923,7 @@ export function ReviewPage({ course, state, onRefresh }: PageProps) {
           )}
           {practice.length ? (
             <section className="practice-section">
-              <h2>Try it independently.</h2>
+              <h2>Independent practice</h2>
               <p className="muted">
                 These exercises appeared because help was used or independent
                 proficiency is still developing. You choose what to revisit.
@@ -981,7 +957,7 @@ export function ReviewPage({ course, state, onRefresh }: PageProps) {
         <aside className="review-sidebar">
           <section className="panel">
             <span className="section-label">Review schedule</span>
-            <h2>Spacing, without pressure.</h2>
+            <h2>Review intervals</h2>
             <p className="muted">
               The interval sequence is 1, 3, 7, 14, and 30 days. A matching
               answer advances one stage; comfortable recall advances two. A
@@ -989,9 +965,7 @@ export function ReviewPage({ course, state, onRefresh }: PageProps) {
             </p>
             <p className="muted">
               Lesson completion, independent proficiency, and review status are
-              separate. You can practice before a review is due. This is a
-              deterministic schedule, not a medically validated personalization
-              system.
+              separate. You can practice before a review is due.
             </p>
           </section>
           <section className="panel">
@@ -1071,8 +1045,8 @@ export function ProjectsPage({ course, state }: PageProps) {
     <div className="page academy-page">
       <PageHeading
         eyebrow="GUIDED PROJECTS"
-        title="Build something worth keeping."
-        description="Bring the concepts together in small, useful programs. Milestones have real checks; your earlier lesson versions stay intact."
+        title="Projects"
+        description="Build a program in checked milestones."
         icon={FolderOpen}
       />
       <div
@@ -1129,7 +1103,7 @@ export function ProjectsPage({ course, state }: PageProps) {
               </div>
             </section>
             <section className="milestone-section">
-              <h2>A program, one milestone at a time.</h2>
+              <h2>Milestones</h2>
               <ol className="milestone-list">
                 {project.milestones.map((milestone, index) => {
                   const progress = state.progress.find(
@@ -1339,8 +1313,7 @@ export function ReferencePage({ course }: Partial<PageProps>) {
     <div className="page academy-page reference-page">
       <PageHeading
         eyebrow="THE FIELD GUIDE"
-        title="A clear explanation, close at hand."
-        description="Look up a concept, format specifier, library function, or compiler diagnostic. Short examples link back to the lesson."
+        title="Reference"
         icon={BookOpen}
       />
       <label className="reference-search" htmlFor="reference-search">
@@ -1592,19 +1565,11 @@ export function SettingsPage({ state, onRefresh }: PageProps) {
   }
   return (
     <div className="page academy-page settings-page">
-      <PageHeading
-        eyebrow="YOUR WORKSPACE"
-        title="Make room for your attention."
-        description="Adjust reading and coding independently. Your preferences and saved work belong to your account."
-        icon={Settings2}
-      />
+      <PageHeading eyebrow="YOUR WORKSPACE" title="Settings" icon={Settings2} />
       <form className="settings-form" onSubmit={savePreferences}>
         <section className="panel">
           <div className="settings-section-heading">
             <h2>Reading & appearance</h2>
-            <p className="muted">
-              Readable type and steady spacing. Choose what feels comfortable.
-            </p>
           </div>
           <div className="settings-fields">
             <label>
@@ -1722,9 +1687,9 @@ export function SettingsPage({ state, onRefresh }: PageProps) {
                   )
                 }
               >
-                <option value={5}>5 minutes · one small step</option>
-                <option value={15}>15 minutes · learn and practice</option>
-                <option value={30}>30 minutes · a deeper session</option>
+                <option value={5}>5 minutes</option>
+                <option value={15}>15 minutes</option>
+                <option value={30}>30 minutes</option>
               </select>
             </label>
             <label>
@@ -1881,11 +1846,6 @@ export function SettingsPage({ state, onRefresh }: PageProps) {
             keeps a local recovery buffer for drafts and queued writes. Offline
             execution is unavailable. A browser crash before a local write
             finishes can still lose the newest keystrokes.
-          </p>
-          <p>
-            Cloud development storage may disappear with its workspace. For
-            durable self-hosting, use the persistent volume and backup procedure
-            in the README.
           </p>
         </div>
       </section>

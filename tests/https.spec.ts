@@ -16,7 +16,7 @@ async function login(page: Page) {
     .getByRole("button", { name: /Create my workshop|Continue learning/ })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Make something click." }),
+    page.getByRole("heading", { name: "Your workshop", exact: true }),
   ).toBeVisible();
 }
 test("actual HTTPS gateway supports desktop to phone account resume, secure cookies, compression, and private worker routes", async ({

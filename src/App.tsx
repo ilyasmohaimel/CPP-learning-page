@@ -28,10 +28,12 @@ import {
   Sun,
   Moon,
   Focus,
+  Check,
 } from "lucide-react";
 import type { CourseMap, LearnerState } from "../shared/app";
 import { api, purgeLocal, getLocalOwner, subscribeLocalOwner } from "./lib/api";
-import { Brand } from "./components/Brand";
+import { Brand, LanguageLogo } from "./components/Brand";
+import { Avatar, Profile } from "./components/Profile";
 import { Auth } from "./components/Auth";
 import { useTheme } from "./lib/theme";
 import {
@@ -51,6 +53,10 @@ const navigation = [
   { to: "/reference", label: "Reference", icon: BookOpen },
   { to: "/settings", label: "Settings", icon: Settings },
 ];
+const courseChoices = [
+  { id: "c17", name: "C programming", language: "C", standard: "C17" },
+  { id: "cpp20", name: "C++ programming", language: "C++", standard: "C++20" },
+] as const;
 export default function App() {
   const localOwner = useSyncExternalStore(
     subscribeLocalOwner,
@@ -61,6 +67,7 @@ export default function App() {
     location = useLocation(),
     navigate = useNavigate();
   const [menu, setMenu] = useState(false),
+    [profileOpen, setProfileOpen] = useState(false),
     [collapsed, setCollapsed] = useState(false),
     [offline, setOffline] = useState(!navigator.onLine),
     [error, setError] = useState(""),
@@ -162,6 +169,16 @@ export default function App() {
       setPreferenceBusy(false);
     }
   }
+  async function chooseCourse(next: "c17" | "cpp20") {
+    if (next === courseId) {
+      setMenu(false);
+      return;
+    }
+    if (await quickPreference({ courseId: next })) {
+      setMenu(false);
+      navigate("/");
+    }
+  }
   if (me.isLoading)
     return (
       <div className="loading-screen">
@@ -215,7 +232,6 @@ export default function App() {
     activity: state.data.activity.filter((a) => exerciseIds.has(a.exerciseId)),
   };
   const props = { course: course.data, state: scopedState, onRefresh: refresh };
-  const languageName = courseId === "cpp20" ? "C++" : "C";
   const lessonId = location.pathname.startsWith("/lesson/")
       ? location.pathname.split("/")[2]
       : null,
@@ -255,6 +271,32 @@ export default function App() {
             </NavLink>
           ))}
         </nav>
+        <section className="sidebar-courses" aria-label="Courses">
+          {courseChoices.map((choice) => (
+            <button
+              key={choice.id}
+              className="course-choice"
+              aria-label={choice.name}
+              aria-pressed={courseId === choice.id}
+              title={choice.name}
+              disabled={preferenceBusy}
+              onClick={() => void chooseCourse(choice.id)}
+            >
+              <LanguageLogo cpp={choice.id === "cpp20"} />
+              <span className="course-choice-copy">
+                <strong>{choice.language}</strong>
+                <small>{choice.standard} course</small>
+              </span>
+              {courseId === choice.id ? (
+                <Check
+                  className="course-selected-mark"
+                  size={16}
+                  aria-hidden="true"
+                />
+              ) : null}
+            </button>
+          ))}
+        </section>
         {module ? (
           <section className="chapter-outline">
             <small>In this chapter</small>
@@ -290,30 +332,25 @@ export default function App() {
               );
             })}
           </section>
-        ) : (
-          <div className="sidebar-note">
-            <span
-              className={`language-logo ${courseId === "cpp20" ? "cpp-logo" : ""}`}
-            >
-              {languageName}
-            </span>
-            <div>
-              <strong>{course.data.course.title}</strong>
-              <small>
-                {course.data.lessons.length} lessons ·{" "}
-                {course.data.course.standard}
-              </small>
-            </div>
-          </div>
-        )}
+        ) : null}
         <div className="sidebar-bottom">
-          <div className="avatar">
-            {me.data.username.slice(0, 1).toUpperCase()}
-          </div>
-          <div>
-            <strong>{me.data.username}</strong>
-            <small>Your private workshop</small>
-          </div>
+          <button
+            className="profile-trigger"
+            aria-label="Edit profile"
+            title="Edit profile"
+            onClick={() => setProfileOpen(true)}
+          >
+            <Avatar
+              name={prefs?.displayName || me.data.username}
+              picture={prefs?.avatarDataUrl}
+            />
+            <span className="profile-trigger-copy">
+              <strong>{prefs?.displayName || me.data.username}</strong>
+              <small>
+                {prefs?.displayName ? `@${me.data.username}` : "Edit profile"}
+              </small>
+            </span>
+          </button>
           <button
             aria-label="Sign out"
             title="Sign out"
@@ -352,21 +389,6 @@ export default function App() {
             ) : null}
           </div>
           <div className="topbar-actions">
-            <label className="course-picker">
-              <span className="sr-only">Course</span>
-              <select
-                aria-label="Course"
-                value={courseId}
-                disabled={preferenceBusy}
-                onChange={async (event) => {
-                  const next = event.target.value as "c17" | "cpp20";
-                  if (await quickPreference({ courseId: next })) navigate("/");
-                }}
-              >
-                <option value="c17">C17</option>
-                <option value="cpp20">C++20</option>
-              </select>
-            </label>
             <span className="standard-label">
               <span />
               {course.data.course.standard} course
@@ -447,11 +469,16 @@ export default function App() {
             </Routes>
           </Suspense>
         </main>
-        <footer className="app-footer">
-          Made for deliberate practice.{" "}
-          <span>C and C++ have separate courses and saved work.</span>
-        </footer>
       </div>
+      {profileOpen ? (
+        <Profile
+          username={me.data.username}
+          preferences={state.data.preferences}
+          busy={preferenceBusy}
+          onSave={quickPreference}
+          onClose={() => setProfileOpen(false)}
+        />
+      ) : null}
     </div>
   );
 }

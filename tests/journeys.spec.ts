@@ -28,7 +28,7 @@ async function signIn(page: Page) {
     .getByRole("button", { name: /Create my workshop|Continue learning/ })
     .click();
   await expect(
-    page.getByRole("heading", { level: 1, name: "Make something click." }),
+    page.getByRole("heading", { level: 1, name: "Your workshop", exact: true }),
   ).toBeVisible();
   suiteCookies = await page.context().cookies();
 }
@@ -77,7 +77,11 @@ test.describe.serial("the learner workspace", () => {
       await page.context().addCookies(suiteCookies);
       await page.goto("/");
       await expect(
-        page.getByRole("heading", { level: 1, name: "Make something click." }),
+        page.getByRole("heading", {
+          level: 1,
+          name: "Your workshop",
+          exact: true,
+        }),
       ).toBeVisible();
     } else await signIn(page);
   });
@@ -426,7 +430,7 @@ test.describe.serial("the learner workspace", () => {
     });
     await page.goto("/path");
     await expect(
-      page.getByRole("heading", { name: "One clear path. Your own pace." }),
+      page.getByRole("heading", { name: "Learning path" }),
     ).toBeVisible();
     await page.screenshot({
       path: `${screenshots}/learning-path-dark.png`,

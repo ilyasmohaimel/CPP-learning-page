@@ -28,7 +28,7 @@ async function signIn(page: Page) {
     .getByRole("button", { name: /Create my workshop|Continue learning/ })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Make something click." }),
+    page.getByRole("heading", { name: "Your workshop", exact: true }),
   ).toBeVisible();
   await expect(page).toHaveURL(`${origin}/forge/`);
 }
@@ -230,7 +230,7 @@ test.describe
     });
     await page.reload();
     await expect(
-      page.getByRole("heading", { name: "Make something click." }),
+      page.getByRole("heading", { name: "Your workshop", exact: true }),
     ).toBeVisible();
     await page.evaluate(() => document.fonts.ready);
     expect(fontPaths.size).toBeGreaterThanOrEqual(2);
@@ -268,9 +268,7 @@ test.describe
     }
     await page.getByRole("link", { name: "Settings", exact: true }).click();
     await expect(page).toHaveURL(`${origin}/forge/settings`);
-    await expect(
-      page.getByRole("heading", { name: "Make room for your attention." }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Settings" })).toBeVisible();
     await page.getByLabel("Suggested session length").selectOption("30");
     await page.getByRole("button", { name: "Save preferences" }).click();
     await expect(

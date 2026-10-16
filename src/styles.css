@@ -464,32 +464,14 @@ details > pre {
   font-size: 10px;
 }
 .language-logo {
-  height: 32px;
-  width: 32px;
-  display: inline-grid;
-  place-items: center;
-  color: var(--blue);
-  background: color-mix(in srgb, var(--blue) 12%, var(--surface));
-  border: 1px solid var(--blue);
-  clip-path: polygon(
-    25% 0,
-    75% 0,
-    100% 25%,
-    100% 75%,
-    75% 100%,
-    25% 100%,
-    0 75%,
-    0 25%
-  );
-  font-family: var(--font-mono);
-  font-size: 22px;
-  font-weight: 700;
+  height: 42px;
+  width: 38px;
+  display: block;
   flex: none;
 }
 .language-logo.small {
-  height: 22px;
+  height: 24px;
   width: 22px;
-  font-size: 13px;
 }
 .sidebar-bottom {
   margin-top: auto;

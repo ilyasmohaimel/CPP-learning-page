@@ -20,7 +20,7 @@ async function signup(page: Page, name: string) {
     .getByRole("button", { name: "Create my workshop", exact: true })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Make something click." }),
+    page.getByRole("heading", { name: "Your workshop", exact: true }),
   ).toBeVisible();
 }
 async function login(page: Page, name: string) {
@@ -34,7 +34,7 @@ async function login(page: Page, name: string) {
     .getByRole("button", { name: "Continue learning", exact: true })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Make something click." }),
+    page.getByRole("heading", { name: "Your workshop", exact: true }),
   ).toBeVisible();
 }
 async function edit(page: Page, code: string) {
@@ -183,7 +183,7 @@ test("light is the default, explicit dark survives first paint and fresh login, 
       release();
     }
     await expect(
-      page.getByRole("heading", { name: "Make something click." }),
+      page.getByRole("heading", { name: "Your workshop", exact: true }),
     ).toBeVisible();
     const secondDevice = await browser.newContext({ colorScheme: "light" });
     const second = await secondDevice.newPage();

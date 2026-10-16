@@ -64,14 +64,8 @@ export function Auth({ onSuccess }: { onSuccess: () => void }) {
       <section className="auth-story">
         <Brand />
         <div className="auth-story-content">
-          <h1>
-            Small steps.
-            <br /> Real programs.
-          </h1>
-          <p>
-            Learn C by understanding an idea, trying it, and making something
-            work.
-          </p>
+          <h1>Learn C and C++</h1>
+          <p>Lessons, exercises and projects with a built-in code editor.</p>
           <div className="auth-example">
             <div className="auth-code">
               <span>
@@ -305,9 +299,9 @@ export function Auth({ onSuccess }: { onSuccess: () => void }) {
             </form>
           )}
           <p className="auth-storage">
-            <strong>Your code. Your pace.</strong>
-            Use the same workshop address and account on your phone and Linux
-            PC. Wait for “Saved to account” before switching devices.
+            <strong>Saved to your account.</strong>
+            Sign in with the same account on another device. Wait for “Saved to
+            account” before closing the editor.
           </p>
         </div>
       </section>

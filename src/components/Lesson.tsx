@@ -44,6 +44,7 @@ import { api, getLocalOwner, readLocalHistory } from "../lib/api";
 import { useDraft } from "../lib/autosave";
 import { Results } from "./Results";
 import { Dialog } from "./Dialog";
+import { LanguageLogo } from "./Brand";
 import type { EditorHandle } from "./Editor";
 const Editor = lazy(() => import("./Editor"));
 const Diagram = lazy(() => import("./TeachingDiagram"));
@@ -369,11 +370,7 @@ function Workspace({
           <h1>{lesson.title}</h1>
           <p>{lesson.objective}</p>
         </div>
-        <span className="lesson-duration">
-          About {lesson.minutes} min
-          <br />
-          <small>Your pace, no timer.</small>
-        </span>
+        <span className="lesson-duration">About {lesson.minutes} min</span>
       </div>
       <div className="lesson-steps" aria-label="Lesson steps">
         {["Learn", "Predict", "Practice", "Recap"].map((s, i) => (
@@ -891,11 +888,7 @@ function Workspace({
             </div>
             <div className="editor-toolbar">
               <div>
-                <span
-                  className={`language-logo small ${course.course.id === "cpp20" ? "cpp-logo" : ""}`}
-                >
-                  {course.course.id === "cpp20" ? "C++" : "C"}
-                </span>
+                <LanguageLogo cpp={course.course.id === "cpp20"} small />
                 <span>
                   {course.course.standard} ·{" "}
                   {course.course.id === "cpp20" ? "G++" : "GCC"} 14

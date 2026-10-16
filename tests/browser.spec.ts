@@ -26,7 +26,7 @@ test("mocked diagnostic transport navigates /src/project.c while ignoring librar
     .getByRole("button", { name: /Create my workshop|Continue learning/ })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Make something click." }),
+    page.getByRole("heading", { name: "Your workshop", exact: true }),
   ).toBeVisible();
 
   const exerciseId = "debugging-checkpoint-project-cli";

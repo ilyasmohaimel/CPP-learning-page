@@ -47,3 +47,37 @@ export function Brand() {
     </div>
   );
 }
+
+export function LanguageLogo({
+  cpp = false,
+  small = false,
+}: {
+  cpp?: boolean;
+  small?: boolean;
+}) {
+  return (
+    <svg
+      className={`language-logo${small ? " small" : ""}`}
+      width="38"
+      height="42"
+      viewBox="0 0 48 52"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path d="M24 1 46 13.5v25L24 51 2 38.5v-25Z" fill="#5389c6" />
+      <path d="m24 26 22-12.5v25L24 51 2 38.5Z" fill="#245b98" />
+      <path
+        d="M33.6 18a12.5 12.5 0 1 0 0 16l-4.2-3.5a7 7 0 1 1 0-9Z"
+        transform={cpp ? "translate(-4 0)" : undefined}
+        fill="#fff"
+      />
+      {cpp ? (
+        <path
+          d="M31 26h5m-2.5-2.5v5m5-2.5h5m-2.5-2.5v5"
+          stroke="#fff"
+          strokeWidth="1.8"
+        />
+      ) : null}
+    </svg>
+  );
+}
