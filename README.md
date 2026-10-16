@@ -3,7 +3,7 @@
   <h1>C Forge</h1>
   <p>A coding workshop for learning C and modern C++.</p>
   <p>Read a short lesson. Write a program. Test your understanding.</p>
-  <p><a href="https://c-forge-workshop.tahuna-2388.chatgpt.site">Open the workshop</a> · <a href="#run-locally">Run locally</a> · <a href="docs/CURRICULUM.md">C course</a> · <a href="docs/CPP-COURSE.md">C++ course</a></p>
+  <p><a href="https://c-forge-workshop.tahuna-2388.chatgpt.site">Open the workshop</a> · <a href="https://c-forge.51.170.138.252.sslip.io:8445/forge/">Direct server</a> · <a href="#run-locally">Run locally</a> · <a href="docs/CURRICULUM.md">C course</a> · <a href="docs/CPP-COURSE.md">C++ course</a></p>
 </div>
 
 ![C Forge lesson and code editor](docs/screenshots/preview-cpp-workspace.png)
@@ -93,6 +93,10 @@ npm run preview
 
 The public workshop may run an earlier release than the source in this repository.
 A Git push does not deploy either hosted workshop.
+
+The hosted workshop and direct server use the same learner accounts and saved
+work. Sign in separately on each hostname. The direct address opens the VPS
+application without going through the Sites host.
 
 ## Built with
 

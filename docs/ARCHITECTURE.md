@@ -6,6 +6,10 @@ existing drafts, histories, imports and jobs without changing the C IDs or data
 schema. `/api/course?course=c17|cpp20` selects navigation; lesson and exercise
 access still use stable IDs.
 
+The current client requests `/api/state?allCourses=true`. The default state
+response keeps C17-only resume, progress, review and activity for Classic and
+older clients; both views use the same account data without resetting it.
+
 The revision-checked `courseId` preference saves the selected course. The state
 response includes a resume for each course, derived from its most recently saved
 draft when the global resume belongs to the other course. Successful draft saves

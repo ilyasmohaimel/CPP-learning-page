@@ -109,7 +109,7 @@ test("C and C++ have complete distinct registries with private assessment materi
   assert.equal(pref.statusCode, 200);
   await server.app.close();
   server = await createApp(options);
-  const state = (await call("/api/state")).json<LearnerState>();
+  const state = (await call("/api/state?allCourses=true")).json<LearnerState>();
   assert.equal(state.preferences.courseId, "cpp20");
   assert.equal(state.preferences.theme, "dark");
   assert.equal(state.courseResumes?.c17?.step, 1);
@@ -195,6 +195,17 @@ test("C and C++ have complete distinct registries with private assessment materi
     })
   ).json();
   assert.equal(check.result.passed, true);
+  const legacy = (await call("/api/state")).json<LearnerState>();
+  assert.equal(legacy.resume?.lessonId, courses[0].lessons[0].id);
+  assert(legacy.progress.every((p) => !p.lessonId.startsWith("cpp-")));
+  assert(legacy.activity.every((a) => !a.exerciseId.startsWith("cpp-")));
+  const current = (
+    await call("/api/state?allCourses=true")
+  ).json<LearnerState>();
+  assert(
+    current.progress.some((p) => p.exerciseId === conceptual.id && p.completed),
+  );
+
   const exportResponse = await call("/api/data/export");
   assert.equal(exportResponse.statusCode, 200);
   const exported = exportResponse.json();

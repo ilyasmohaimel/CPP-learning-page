@@ -72,7 +72,7 @@ export default function App() {
   });
   const state = useQuery({
     queryKey: ["state", me.data?.id],
-    queryFn: () => api<LearnerState>("/api/state"),
+    queryFn: () => api<LearnerState>("/api/state?allCourses=true"),
     enabled: !!me.data,
   });
   const routeCourse = location.pathname.startsWith("/lesson/")

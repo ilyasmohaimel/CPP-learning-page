@@ -256,7 +256,25 @@ export function learningRoutes(ctx: Context) {
       })),
     };
   });
-  app.get("/api/state", async (req) => learnerState(ctx, requireOwner(req)));
+  app.get<{ Querystring: { allCourses?: string } }>(
+    "/api/state",
+    async (req) => {
+      const state = learnerState(ctx, requireOwner(req));
+      if (req.query.allCourses === "true") return state;
+      // Classic and older clients know only C17 lesson IDs. Preserve their resume
+      // and progress view while the current client explicitly requests all courses.
+      const course = ctx.courses[0];
+      const lessons = new Set(course.lessons.map((l) => l.id));
+      const exercises = new Set(course.exercises.map((e) => e.id));
+      return {
+        ...state,
+        resume: state.courseResumes?.[course.course.id] ?? null,
+        progress: state.progress.filter((p) => lessons.has(p.lessonId)),
+        reviews: state.reviews.filter((r) => lessons.has(r.lessonId)),
+        activity: state.activity.filter((a) => exercises.has(a.exerciseId)),
+      };
+    },
+  );
   app.get<{ Params: { id: string } }>("/api/lessons/:id", async (req) => {
     requireOwner(req);
     const lesson = ctx.lesson(req.params.id);
