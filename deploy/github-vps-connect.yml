@@ -1,0 +1,63 @@
+# Install only in the existing private SSH recovery repository, after explicit
+# authorization for its one workflow commit. This is a read-only connection probe.
+name: C Forge VPS connection
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [.github/workflows/c-forge-connect.yml]
+permissions:
+  contents: read
+concurrency:
+  group: c-forge-vps-deployment
+  cancel-in-progress: false
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    env:
+      CFORGE_HOST: 51.170.138.252
+      CFORGE_SSH_PORT: "22"
+      CFORGE_SSH_USER: ubuntu
+    steps:
+      - name: Read only the existing key and saved host keys
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # verified v4 tag
+        with:
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            secrets/ssh/ssh-key-2026-08-12.key
+            secrets/ssh/known_hosts
+      - name: Verify the pinned SSH peer and inspect deployment prerequisites
+        shell: bash
+        run: |
+          set -euo pipefail
+          cforge_ssh_dir="$RUNNER_TEMP/c-forge-ssh"
+          install -d -m 700 "$cforge_ssh_dir"
+          trap 'rm -rf "$cforge_ssh_dir"' EXIT
+          install -m 600 secrets/ssh/ssh-key-2026-08-12.key "$cforge_ssh_dir/identity"
+          install -m 600 secrets/ssh/known_hosts "$cforge_ssh_dir/known_hosts"
+          ssh -F /dev/null -i "$cforge_ssh_dir/identity" \
+            -p "$CFORGE_SSH_PORT" \
+            -o IdentitiesOnly=yes -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$cforge_ssh_dir/known_hosts" \
+            -o ConnectTimeout=15 -o ConnectionAttempts=1 \
+            -o ServerAliveInterval=10 -o ServerAliveCountMax=2 \
+            "$CFORGE_SSH_USER@$CFORGE_HOST" 'bash -se' <<'CFORGE_REMOTE_INSPECT'
+          set -eu
+          id
+          uname -m
+          . /etc/os-release
+          printf '%s\n' "$PRETTY_NAME"
+          df -h /srv
+          ss -lnt
+          for cforge_command in node docker podman nginx; do
+            command -v "$cforge_command" || true
+          done
+          if sudo -n true; then
+            printf 'NONINTERACTIVE_ADMIN_AVAILABLE\n'
+          else
+            printf 'NONINTERACTIVE_ADMIN_UNAVAILABLE\n'
+          fi
+          CFORGE_REMOTE_INSPECT

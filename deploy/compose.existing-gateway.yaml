@@ -1,0 +1,9 @@
+# For a server whose port 3000 is already occupied (for example, AdGuard Home).
+# Requires Compose 2.24.4+ for !override. Does not start another public gateway.
+# docker compose -f compose.yaml -f deploy/compose.existing-gateway.yaml up --build -d
+services:
+  app:
+    environment:
+      COOKIE_SECURE: "true"
+    ports: !override
+      - "127.0.0.1:3030:3000"

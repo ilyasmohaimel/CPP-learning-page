@@ -1,0 +1,32 @@
+# Add to compose.yaml; named app/database storage is shared with the base setup.
+# docker compose --env-file .env.https -f compose.yaml -f deploy/compose.https.yaml up --build -d
+services:
+  app:
+    environment:
+      COOKIE_SECURE: "true"
+  gateway:
+    image: caddy:2.11.7-alpine
+    environment:
+      CFORGE_DOMAIN: ${CFORGE_DOMAIN:?Set CFORGE_DOMAIN to your real DNS hostname}
+      CFORGE_UPSTREAM: app:3000
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - cforge-caddy-data:/data
+      - cforge-caddy-config:/config
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m,mode=1777
+    cap_drop: [ALL]
+    cap_add: [NET_BIND_SERVICE]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 100
+    restart: unless-stopped
+    depends_on:
+      app:
+        condition: service_healthy
+volumes:
+  cforge-caddy-data:
+  cforge-caddy-config:

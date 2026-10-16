@@ -1,0 +1,19 @@
+# Add this virtual host to existing Nginx; never overwrite its main config.
+# Replace forge.example.com and use certificates already issued for your hostname.
+server {
+    listen 443 ssl;
+    server_name forge.example.com;
+    ssl_certificate /etc/letsencrypt/live/forge.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/forge.example.com/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    add_header Strict-Transport-Security "max-age=31536000" always;
+    client_max_body_size 4m;
+    location = /internal { return 404; }
+    location ^~ /internal/ { return 404; }
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}

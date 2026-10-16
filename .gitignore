@@ -1,0 +1,18 @@
+node_modules/
+dist/
+.data/
+.env
+*.sqlite*
+test-results/
+playwright-report/
+.data*/
+.npm-cache/
+.env.https
+.env.gateway-test
+.sites-runtime/
+.wrangler/
+*.tgz
+__pycache__/
+
+# Ignore dependency directory symlinks as well as directories.
+node_modules

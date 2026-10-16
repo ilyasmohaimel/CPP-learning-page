@@ -1,0 +1,32 @@
+{
+  "id": "./",
+  "name": "C Forge — Coding Workshop",
+  "short_name": "C Forge",
+  "description": "Learn C with focused lessons, persistent coding practice, and guided projects.",
+  "lang": "en",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f4ef",
+  "theme_color": "#f5f4ef",
+  "icons": [
+    {
+      "src": "icons/forge-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/forge-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/forge-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

@@ -1,0 +1,131 @@
+{
+  "version": 1,
+  "course": "c17",
+  "policy": "C17 baseline; four substantive lessons and eight assessed exercises per module. Fourth lesson is a checkpoint. Stable IDs never change with titles.",
+  "modules": [
+    {
+      "id": "first-program",
+      "title": "First program",
+      "lessons": [
+        "source-to-program",
+        "printing-text",
+        "statements-and-comments",
+        "first-program-checkpoint"
+      ]
+    },
+    {
+      "id": "values",
+      "title": "Values and expressions",
+      "lessons": [
+        "variables-and-types",
+        "arithmetic-and-conversions",
+        "formats-and-sizeof",
+        "values-checkpoint"
+      ]
+    },
+    {
+      "id": "decisions",
+      "title": "Decisions",
+      "lessons": [
+        "comparisons-and-truth",
+        "branching-rules",
+        "short-circuit-and-switch",
+        "decisions-checkpoint"
+      ]
+    },
+    {
+      "id": "repetition",
+      "title": "Repetition",
+      "lessons": [
+        "while-and-invariants",
+        "for-and-bounds",
+        "accumulators-and-control",
+        "repetition-checkpoint"
+      ]
+    },
+    {
+      "id": "functions",
+      "title": "Functions and decomposition",
+      "lessons": [
+        "parameters-and-results",
+        "prototypes-and-scope",
+        "value-and-lifetime",
+        "functions-checkpoint"
+      ]
+    },
+    {
+      "id": "arrays-strings",
+      "title": "Arrays and strings",
+      "lessons": [
+        "array-indices-and-length",
+        "character-arrays",
+        "text-and-capacity",
+        "arrays-checkpoint"
+      ]
+    },
+    {
+      "id": "pointers",
+      "title": "Pointers and memory",
+      "lessons": [
+        "addresses-and-dereference",
+        "pointer-parameters",
+        "arrays-to-pointers",
+        "pointers-checkpoint"
+      ]
+    },
+    {
+      "id": "input",
+      "title": "Input and validation",
+      "lessons": [
+        "bounded-line-input",
+        "strtol-and-end-pointer",
+        "range-and-truncation",
+        "input-checkpoint"
+      ]
+    },
+    {
+      "id": "records",
+      "title": "Structured data",
+      "lessons": [
+        "struct-members",
+        "typedef-and-enum",
+        "arrays-of-records",
+        "records-checkpoint"
+      ]
+    },
+    {
+      "id": "allocation",
+      "title": "Dynamic allocation",
+      "lessons": [
+        "allocate-and-release",
+        "ownership-and-failure",
+        "safe-growth",
+        "allocation-checkpoint"
+      ]
+    },
+    {
+      "id": "files-structure",
+      "title": "Files and program structure",
+      "lessons": [
+        "file-errors-and-persistence",
+        "arguments-and-formats",
+        "headers-and-linking",
+        "structure-checkpoint"
+      ]
+    },
+    {
+      "id": "debugging",
+      "title": "Debugging and integration",
+      "lessons": [
+        "warnings-and-gdb",
+        "sanitizers-and-lifetime",
+        "behavior-and-portability",
+        "debugging-checkpoint"
+      ]
+    }
+  ],
+  "projects": ["numerical-toolkit", "record-manager", "study-tracker"],
+  "assessments": "Two exercises per lesson: guided behavior/edit plus independent code/debug/retrieval. Most compile C; conceptual diagnoses never assert output for undefined behavior. Projects add independent behavioral milestones.",
+  "prerequisites": "Lesson DAG follows module order, with explicit earlier IDs for all scaffolding. Numeric input appears only after pointers and strings. Allocation appears only after lifetime. Files and Makefiles follow allocation.",
+  "versions": "All content starts at version 1; learner attempts retain their content version."
+}

@@ -1,0 +1,14 @@
+# One HTTPS origin for the frontend and API. Public DNS must reach this host.
+{$CFORGE_DOMAIN} {
+	encode zstd gzip
+
+	# Only the private local worker may reach its authenticated control APIs.
+	@runner path /internal /internal/*
+	respond @runner 404
+
+	header Strict-Transport-Security "max-age=31536000"
+
+	# Caddy preserves the incoming Host and Origin for application CSRF checks.
+	# In Compose: app:3000. On a bare host: 127.0.0.1:3000.
+	reverse_proxy {$CFORGE_UPSTREAM:app:3000}
+}

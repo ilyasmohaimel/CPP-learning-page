@@ -1,0 +1,22 @@
+[Unit]
+Description=C Forge private isolated compiler worker
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/c-forge
+EnvironmentFile=/etc/c-forge/runner.env
+Environment=TMPDIR=/var/lib/c-forge-runner/jobs
+ExecStart=/usr/bin/env node --import tsx runner/worker.ts
+Restart=on-failure
+RestartSec=5
+KillSignal=SIGTERM
+TimeoutStopSec=20
+UMask=0077
+# Install as the dedicated unprivileged worker's USER service. Podman needs
+# delegated cgroup v2 and user namespaces; do not add a public container socket.
+Delegate=yes
+
+[Install]
+WantedBy=default.target
