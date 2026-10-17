@@ -1,3 +1,37 @@
+# Dashboard update, 2026-10-17
+
+The dashboard now shows all 12 chapters, per-chapter completion, the current
+chapter's lessons, overall lesson/exercise counts and all three project briefs.
+The layout uses more of the available width. Session planning, reviews and actual
+recent work occupy a compact side column. Phone layouts stack these sections;
+empty accounts retain honest empty states. Obsolete dashboard styles were removed.
+
+Typecheck, lint, formatting, content audits and production builds pass. Local
+unit/integration tests report 57 passes and one native isolation skip. All 10
+core browser journeys, two account/theme journeys and the extended two-course
+journey pass. The latter checks chapter navigation, both course dashboards,
+profile editing, fresh-login restoration, per-course drafts and resume positions.
+Widths of 390, 768, 1024, 1440 and 1864 pixels were checked without page overflow.
+Dashboard accessibility scans in both themes, plus profile and workspace
+scans, report no violations. Desktop and phone screenshots were visually inspected.
+
+Frontend source `9b6642e` is published to the direct VPS and primary Site version
+12. The VPS frontend-only release preserves the existing backend `1a70998`, all
+learner data and existing hashed assets. It backs up the previous frontend before
+replacing the entrypoint. Trusted HTTPS entrypoint and referenced asset bytes,
+API/worker health, protected configuration hashes and existing service states
+passed verification. No service restart or network configuration change was
+needed. The temporary manual release workflow was removed, and the original
+read-only workflow remains unchanged.
+
+The supplied account's existing live session was accessible before publication.
+Post-publication browser automation timed out during reload and fresh-tab
+inspection, so a final live interactive check is unverified. Publication and
+HTTPS/asset checks succeeded independently. The native compiler checks below
+belong to the unchanged backend release and were not rerun for this frontend update.
+
+---
+
 # Sidebar, profiles and copy update, 2026-10-16
 
 Both courses are visible in the sidebar with local SVG logos and a selected
