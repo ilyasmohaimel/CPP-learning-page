@@ -199,7 +199,6 @@ export function HomePage({ course, state }: PageProps) {
   const exerciseIndex =
     resumeLesson?.exerciseIds.indexOf(state.resume?.exerciseId ?? "") ?? -1;
   const completedExercises = state.progress.filter((p) => p.completed).length;
-  const proficient = state.progress.filter((p) => p.proficient).length;
   const due = state.reviews.filter(
     (r) => new Date(r.dueAt).getTime() <= Date.now(),
   );
@@ -223,170 +222,218 @@ export function HomePage({ course, state }: PageProps) {
     )
       break;
   }
+  const currentModule = course.modules.find(
+    (m) => m.id === resumeLesson?.moduleId,
+  );
+  const chapterIndex = course.modules.findIndex(
+    (m) => m.id === currentModule?.id,
+  );
+  const chapterLessons = course.lessons.filter(
+    (l) => l.moduleId === currentModule?.id,
+  );
+  const exerciseTotal = course.lessons.reduce(
+    (total, lesson) => total + lesson.exerciseIds.length,
+    0,
+  );
   return (
-    <div className="page academy-page">
+    <div className="page academy-page workshop-page">
       <PageHeading eyebrow="YOUR WORKSHOP" title="Your workshop" icon={Code2} />
-      <div className="home-primary">
-        <section className="continue-card" aria-labelledby="continue-heading">
-          <div className="continue-topline">
-            <span className="section-label">
-              {state.resume ? "Continue learning" : "Your first lesson"}
-            </span>
-            <span className="course-standard">{course.course.standard}</span>
-          </div>
-          <div className="continue-content">
-            <div className="continue-art" aria-hidden="true">
-              {String(
-                Math.max(
-                  1,
-                  course.modules.findIndex(
-                    (m) => m.id === resumeLesson?.moduleId,
-                  ) + 1,
-                ),
-              ).padStart(2, "0")}
-            </div>
-            <div>
-              <p className="continue-chapter">
-                Chapter{" "}
-                {Math.max(
-                  1,
-                  course.modules.findIndex(
-                    (m) => m.id === resumeLesson?.moduleId,
-                  ) + 1,
-                )}{" "}
-                ·{" "}
-                {
-                  course.modules.find((m) => m.id === resumeLesson?.moduleId)
-                    ?.title
-                }
-              </p>
+      <div className="workshop-progress" aria-label="Course progress">
+        <strong>
+          {course.course.id === "cpp20" ? "C++ programming" : "C programming"}
+        </strong>
+        <span>
+          {done.size} / {course.lessons.length} lessons completed
+        </span>
+        <span>
+          {completedExercises} / {exerciseTotal} exercises completed
+        </span>
+        <span>{due.length} reviews due</span>
+      </div>
+      <div className="workshop-grid">
+        <div className="workshop-main">
+          <section
+            className="lesson-spotlight"
+            aria-labelledby="continue-heading"
+          >
+            <div className="spotlight-lesson">
+              <div className="spotlight-meta">
+                <span>{state.resume ? "Continue learning" : "Start here"}</span>
+                <span className="course-standard">
+                  {course.course.standard}
+                </span>
+              </div>
               <h2 id="continue-heading">
                 {resumeLesson?.title ?? course.course.title}
               </h2>
               <p>{resumeLesson?.objective}</p>
-              {state.resume ? (
-                <p className="resume-position">
-                  <FileCode2 size={15} aria-hidden="true" />
-                  Exercise{" "}
-                  {exerciseIndex >= 0
-                    ? exerciseIndex + 1
-                    : state.resume.exerciseId}{" "}
-                  · saved step {state.resume.step + 1}
-                </p>
-              ) : (
-                <p className="resume-position">
-                  <Clock3 size={15} aria-hidden="true" />
-                  About {resumeLesson?.minutes ?? 8} minutes · no prior{" "}
-                  {course.course.id === "cpp20" ? "C++" : "C"} knowledge needed
-                </p>
-              )}
-              {resumeLesson ? (
-                <Link
-                  className="button"
-                  to={lessonHref(resumeLesson.id, state.resume?.exerciseId)}
-                >
-                  {state.resume ? "Resume lesson" : "Begin the course"}
-                  <ArrowRight size={17} aria-hidden="true" />
-                </Link>
-              ) : null}
+              <div className="spotlight-action">
+                {resumeLesson ? (
+                  <Link
+                    className="button"
+                    to={lessonHref(resumeLesson.id, state.resume?.exerciseId)}
+                  >
+                    {state.resume ? "Resume lesson" : "Begin the course"}
+                    <ArrowRight size={16} aria-hidden="true" />
+                  </Link>
+                ) : null}
+                <span>
+                  <Clock3 size={14} aria-hidden="true" />
+                  {resumeLesson?.minutes ?? 8} min
+                  {state.resume && exerciseIndex >= 0
+                    ? ` · Exercise ${exerciseIndex + 1}`
+                    : ""}
+                </span>
+              </div>
             </div>
-          </div>
-          <div className="continue-footer">
-            <span>
-              Your draft and current step are saved to your account when sync
-              succeeds.
-            </span>
-            <Link to="/settings">
-              Data & recovery
-              <ArrowUpRight size={13} aria-hidden="true" />
-            </Link>
-          </div>
-        </section>
-        <aside
-          className="panel session-panel"
-          aria-labelledby="session-heading"
-        >
-          <h2 id="session-heading">Suggested session</h2>
-          <p className="muted">About {effort} minutes</p>
-          <ol className="session-list">
-            {sessionLessons.map((lesson, index) => (
-              <li key={lesson.id}>
-                <span className="session-number">{index + 1}</span>
-                <div>
-                  <Link to={lessonHref(lesson.id)}>{lesson.title}</Link>
-                  <small className="muted">About {lesson.minutes} min</small>
-                </div>
-              </li>
-            ))}
-          </ol>
-          <Link className="text-link" to="/settings">
-            Session settings
-            <ArrowRight size={14} aria-hidden="true" />
-          </Link>
-        </aside>
-      </div>
-      <div className="home-secondary">
-        <section
-          className="panel path-preview"
-          aria-labelledby="path-preview-heading"
-        >
-          <div className="section-top">
-            <div>
+            <div className="spotlight-chapter">
+              <p>
+                Chapter {chapterIndex + 1} / {course.modules.length}
+              </p>
+              <h3>{currentModule?.title}</h3>
+              <ol>
+                {chapterLessons.map((lesson, i) => (
+                  <li key={lesson.id}>
+                    <Link
+                      to={lessonHref(lesson.id)}
+                      aria-current={
+                        lesson.id === resumeLesson?.id ? "step" : undefined
+                      }
+                    >
+                      {done.has(lesson.id) ? (
+                        <Check size={14} aria-hidden="true" />
+                      ) : (
+                        <span className="chapter-lesson-number">{i + 1}</span>
+                      )}
+                      <span>{lesson.title}</span>
+                      <span className="chapter-lesson-time">
+                        {lesson.minutes}m
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </section>
+          <section
+            className="chapter-board"
+            aria-labelledby="path-preview-heading"
+          >
+            <div className="section-top">
               <h2 id="path-preview-heading">Course overview</h2>
+              <Link className="text-link" to="/path">
+                All lessons
+                <ArrowRight size={15} aria-hidden="true" />
+              </Link>
             </div>
-            <Link className="text-link" to="/path">
-              All chapters
-              <ArrowRight size={16} aria-hidden="true" />
-            </Link>
-          </div>
-          <p className="muted">
-            {course.lessons.length} lessons · {course.modules.length} chapters ·{" "}
-            {course.projects.length} projects
-          </p>
-          <ol className="chapter-preview-list">
-            {course.modules.slice(0, 4).map((module, i) => (
-              <li key={module.id}>
-                <ChapterMark index={i} />
-                <div>
-                  <Link to={`/path#${module.id}`}>{module.title}</Link>
-                  <small className="muted">
-                    Chapter {i + 1} ·{" "}
-                    {module.lessonIds.filter((id) => done.has(id)).length} /{" "}
-                    {module.lessonIds.length} lessons completed
-                  </small>
-                </div>
-                <ArrowRight size={15} className="muted" aria-hidden="true" />
-              </li>
-            ))}
-          </ol>
-          {completedExercises > 0 ? (
-            <p className="progress-explanation">
-              {completedExercises} exercises completed · {proficient}{" "}
-              demonstrated independently. Completion and proficiency are tracked
-              separately.
+            <ol className="chapter-grid">
+              {course.modules.map((module, i) => {
+                const completed = module.lessonIds.filter((id) =>
+                  done.has(id),
+                ).length;
+                return (
+                  <li key={module.id}>
+                    <Link
+                      className={`chapter-tile ${module.id === currentModule?.id ? "current" : ""}`}
+                      to={`/path#${module.id}`}
+                    >
+                      <ChapterMark index={i} />
+                      <div className="chapter-tile-copy">
+                        <span>
+                          Chapter {i + 1}
+                          <small>
+                            {completed} / {module.lessonIds.length}
+                          </small>
+                        </span>
+                        <strong>{module.title}</strong>
+                        <progress
+                          value={completed}
+                          max={module.lessonIds.length}
+                          aria-label={`${module.title}: lessons completed`}
+                        />
+                      </div>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ol>
+          </section>
+          <section
+            className="workshop-projects"
+            aria-labelledby="workshop-projects-heading"
+          >
+            <div className="section-top">
+              <h2 id="workshop-projects-heading">Projects</h2>
+              <FolderOpen size={18} aria-hidden="true" />
+            </div>
+            <div className="project-shelf">
+              {course.projects.map((project) => (
+                <Link
+                  key={project.id}
+                  to={`/projects?project=${encodeURIComponent(project.id)}`}
+                >
+                  <strong>
+                    {project.title}
+                    <ArrowUpRight size={16} aria-hidden="true" />
+                  </strong>
+                  <p>{project.brief}</p>
+                </Link>
+              ))}
+            </div>
+          </section>
+        </div>
+        <aside className="workshop-aside">
+          <section
+            className="workshop-session"
+            aria-labelledby="session-heading"
+          >
+            <div className="section-top">
+              <h2 id="session-heading">Suggested session</h2>
+              <Clock3 size={17} aria-hidden="true" />
+            </div>
+            <p className="muted">
+              {sessionLessons.length
+                ? `About ${effort} minutes`
+                : "All lessons completed"}
             </p>
-          ) : null}
-        </section>
-        <div className="home-side-stack">
-          <section className="panel" aria-labelledby="review-summary-heading">
-            <div className="panel-icon">
-              <RotateCcw size={19} aria-hidden="true" />
+            <ol className="session-list">
+              {sessionLessons.map((lesson, index) => (
+                <li key={lesson.id}>
+                  <span className="session-number">{index + 1}</span>
+                  <div>
+                    <Link to={lessonHref(lesson.id)}>{lesson.title}</Link>
+                    <small className="muted">{lesson.minutes} min</small>
+                  </div>
+                </li>
+              ))}
+            </ol>
+            <Link className="text-link" to="/settings">
+              Session settings
+              <ArrowRight size={14} aria-hidden="true" />
+            </Link>
+          </section>
+          <section
+            className="workshop-review"
+            aria-labelledby="review-summary-heading"
+          >
+            <div className="section-top">
+              <h2 id="review-summary-heading">Review</h2>
+              <RotateCcw size={17} aria-hidden="true" />
             </div>
-            <h2 id="review-summary-heading">Review</h2>
             <p className="muted">
               {due.length
                 ? `${due.length} ${due.length === 1 ? "question" : "questions"} due.`
                 : state.reviews.length
                   ? "Next review scheduled."
-                  : "No reviews yet."}
+                  : "No reviews due."}
             </p>
             <Link className="text-link" to="/review">
               {due.length ? "Start review" : "Practice & review"}
-              <ArrowRight size={16} aria-hidden="true" />
+              <ArrowRight size={15} aria-hidden="true" />
             </Link>
           </section>
           <section
-            className="panel activity-panel"
+            className="workshop-activity activity-panel"
             aria-labelledby="activity-heading"
           >
             <div className="section-top">
@@ -441,7 +488,7 @@ export function HomePage({ course, state }: PageProps) {
               <p className="muted">No runs or checks yet.</p>
             )}
           </section>
-        </div>
+        </aside>
       </div>
     </div>
   );

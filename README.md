@@ -54,6 +54,8 @@ C and C++ have separate language rules, file types and compiler settings.
 <summary>More screenshots</summary>
 
 ![Learning dashboard](docs/screenshots/preview-home.png)
+![Dashboard in dark mode](docs/screenshots/preview-home-dark.png)
+![Dashboard on a phone](docs/screenshots/preview-home-mobile.png)
 ![C++ editor on a phone-sized screen](docs/screenshots/preview-mobile.png)
 ![Profile editor](docs/screenshots/preview-profile.png)
 

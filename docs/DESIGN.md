@@ -17,10 +17,17 @@ Text sizes and line spacing follow the learner's preferences.
 
 ## Course choice
 
-The header selector names the language and baseline, C17 or C++20. It remains
-available at phone widths, has a visible keyboard focus state, and waits for the
-account preference update before re-enabling. The selected course controls the
-path, projects, reference entries and editor labels.
+Both language choices live in the sidebar, with local SVG logos and a selected
+state. The phone navigation drawer keeps the same choices. Course changes wait
+for the account preference update before re-enabling. The selected course controls
+the path, projects, reference entries and editor labels.
+
+## Dashboard
+
+A compact resume area includes the current chapter’s lesson list. All 12 chapters
+show completed lesson counts and progress bars; the three projects link directly
+to their briefs. A narrow side column holds the suggested session, review status
+and actual recent work. The layout uses the available width and stacks on phones.
 
 ## Content and feedback
 

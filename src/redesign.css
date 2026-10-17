@@ -333,110 +333,11 @@ a:hover {
 .academy-page .panel {
   border-radius: 12px;
 }
-.home-primary {
-  grid-template-columns: minmax(0, 1.9fr) minmax(260px, 1fr);
-  gap: 30px;
-  margin-bottom: 34px;
-}
-.continue-card {
-  background: var(--feature);
-  border: 1px solid #c8d1fa;
-  color: var(--feature-text);
-  border-radius: 15px;
-}
-.continue-topline {
-  padding: 24px 28px 0;
-}
-.continue-topline .section-label {
-  color: var(--feature-text);
-  font-size: 13px;
-}
 .course-standard {
   border-color: #737da3;
   background: transparent;
   color: var(--feature-text);
   font-size: 11px;
-}
-.continue-content {
-  padding: 22px 28px 24px;
-  gap: 0;
-  min-height: 250px;
-}
-.continue-content > div:last-child {
-  padding-right: 76px;
-}
-.continue-content h2 {
-  font-family: var(--display);
-  font-weight: 600;
-  font-size: clamp(27px, 2.5vw, 35px);
-  letter-spacing: -0.025em;
-  line-height: 1.15;
-  margin: 8px 0 12px;
-}
-.continue-chapter {
-  color: var(--feature-muted);
-  font-size: 12px !important;
-  margin: 0 0 14px !important;
-}
-.continue-content > div > p {
-  font-size: 15px;
-  line-height: 1.7;
-}
-.continue-content .resume-position {
-  color: var(--feature-muted);
-  margin: 18px 0;
-  font-size: 12px !important;
-}
-.continue-art {
-  position: absolute;
-  top: 61px;
-  right: 21px;
-  display: block;
-  width: auto;
-  height: auto;
-  border: 0;
-  border-radius: 0;
-  background: none;
-  box-shadow: none;
-  font-family: var(--display);
-  font-size: 112px;
-  line-height: 1;
-  font-weight: 500;
-  color: #58689e;
-  letter-spacing: -0.08em;
-}
-.continue-card .button {
-  color: #f5f4ef;
-  background: #20212b;
-  border-color: #20212b;
-  padding-inline: 18px;
-}
-.continue-footer {
-  background: transparent;
-  border-color: #939ecb;
-  color: var(--feature-muted);
-  padding: 14px 28px;
-  align-items: center;
-  font-size: 11px;
-}
-.continue-footer a {
-  color: var(--feature-text);
-  white-space: nowrap;
-}
-.home-primary > .session-panel {
-  border: 0;
-  border-radius: 0;
-  background: none;
-  padding: 16px 0 0 0;
-}
-.academy-page .session-panel h2 {
-  font-family: var(--display);
-  font-size: 25px;
-  font-weight: 500;
-  margin-top: 0;
-}
-.session-panel > p {
-  font-size: 13px;
 }
 .session-list {
   margin: 24px 0;
@@ -454,49 +355,6 @@ a:hover {
   color: var(--bg);
   border-color: var(--accent);
 }
-.home-secondary {
-  border-top: 1px solid var(--border);
-  padding-top: 28px;
-  gap: 30px;
-  grid-template-columns: minmax(0, 1.9fr) minmax(260px, 1fr);
-}
-.home-secondary .panel {
-  border: 0;
-  border-radius: 0;
-  background: none;
-  padding: 0;
-}
-.home-secondary h2 {
-  font-family: var(--display);
-  font-size: 28px;
-  font-weight: 500;
-}
-.path-preview .section-top h2 {
-  max-width: none;
-  font-size: 28px;
-  margin-top: 0;
-}
-.home-secondary .path-preview > p {
-  font-size: 14px;
-}
-.home-side-stack {
-  border-left: 1px solid var(--border);
-  padding-left: 26px;
-  gap: 28px;
-}
-.home-side-stack .activity-panel {
-  border-top: 1px solid var(--border);
-  padding-top: 23px;
-}
-.home-side-stack .panel-icon {
-  display: none;
-}
-.chapter-preview-list {
-  margin-top: 20px;
-}
-.chapter-preview-list li {
-  padding-block: 16px;
-}
 .chapter-marker {
   border-radius: 10px;
   background: color-mix(in srgb, var(--chapter-color) 7%, var(--surface));
@@ -512,9 +370,6 @@ a:hover {
 }
 .marker-3 {
   --chapter-color: var(--purple);
-}
-.chapter-preview-list small {
-  font-size: 11px;
 }
 .lesson-page {
   padding: 32px 32px 0;
@@ -618,36 +473,8 @@ a:hover {
   .academy-page {
     padding: 32px 24px 48px;
   }
-  .home-primary,
-  .home-secondary {
-    gap: 24px;
-    grid-template-columns: minmax(0, 1.65fr) minmax(220px, 1fr);
-  }
-  .continue-content > div:last-child {
-    padding-right: 45px;
-  }
-  .continue-art {
-    font-size: 85px;
-    right: 14px;
-    top: 73px;
-  }
-  .continue-topline {
-    padding-inline: 22px;
-  }
-  .continue-content,
-  .continue-footer {
-    padding-inline: 22px;
-  }
   .lesson-page {
     padding: 28px 22px 0;
-  }
-}
-@media (max-width: 900px) {
-  .home-primary {
-    grid-template-columns: minmax(0, 1.8fr) minmax(220px, 1fr);
-  }
-  .continue-content > div:last-child {
-    padding-right: 54px;
   }
 }
 @media (max-width: 680px) {
@@ -662,60 +489,6 @@ a:hover {
   }
   .academy-heading > p {
     font-size: 15px;
-  }
-  .home-primary,
-  .home-secondary {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 28px;
-  }
-  .continue-content {
-    min-height: 0;
-    padding: 22px;
-  }
-  .continue-content > div:last-child {
-    padding-right: 0;
-  }
-  .continue-content h2 {
-    font-size: 30px;
-    max-width: 9.5em;
-  }
-  .continue-content .button {
-    margin-left: 0;
-    width: 100%;
-  }
-  .continue-art {
-    top: 20px;
-    right: 67px;
-    font-size: 36px;
-    letter-spacing: -0.05em;
-    color: var(--feature-muted);
-  }
-  .continue-topline {
-    padding: 24px 22px 0;
-  }
-  .continue-topline .section-label {
-    max-width: 170px;
-  }
-  .continue-footer {
-    display: block;
-    padding: 15px 22px;
-  }
-  .continue-footer a {
-    display: inline-flex;
-    margin-top: 10px;
-  }
-  .continue-footer > span {
-    display: block;
-  }
-  .home-primary > .session-panel {
-    padding: 0;
-  }
-  .home-side-stack {
-    border-left: 0;
-    padding-left: 0;
-  }
-  .home-secondary h2 {
-    font-size: 27px;
   }
   .lesson-page {
     padding: 25px 16px 0;
@@ -1258,13 +1031,6 @@ a:hover {
     border-left: 0;
     border-top: 1px solid var(--border);
   }
-}
-.home-primary > .session-panel {
-  align-self: start;
-}
-.home-primary .session-list {
-  flex: none;
-  margin-bottom: 18px;
 }
 
 @media (max-width: 600px) {

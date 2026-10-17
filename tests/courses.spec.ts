@@ -35,6 +35,20 @@ test("both courses preserve drafts, course choice and resume across switches and
   await expect(cppChoice).toBeVisible();
   await expect(cChoice).toHaveAttribute("aria-pressed", "true");
   await expect(cppChoice).toHaveAttribute("aria-pressed", "false");
+  await expect(page.locator(".chapter-grid > li")).toHaveCount(12);
+  await expect(page.locator(".workshop-progress")).toContainText(
+    "0 / 48 lessons completed",
+  );
+  await expect(page.locator(".project-shelf > a")).toHaveCount(3);
+  const lastChapter = page
+    .locator(".chapter-grid > li")
+    .last()
+    .getByRole("link");
+  const target = await lastChapter.getAttribute("href");
+  await lastChapter.click();
+  await expect(page).toHaveURL(new RegExp(`${target}$`));
+  await expect(page.locator(target!.replace("/path", ""))).toBeVisible();
+  await page.getByRole("link", { name: "Continue", exact: true }).click();
   await page.getByRole("button", { name: "Edit profile", exact: true }).click();
   const profile = page.getByRole("dialog", {
     name: "Edit profile",
@@ -176,10 +190,50 @@ test("both courses preserve drafts, course choice and resume across switches and
   await expect(
     page.getByRole("link", { name: "Resume lesson", exact: true }),
   ).toHaveAttribute("href", /cpp-source-and-output/);
+  await expect(page.locator(".chapter-grid > li")).toHaveCount(12);
+  await expect(page.locator(".project-shelf")).toContainText("Number toolkit");
   await page.screenshot({
     path: "docs/screenshots/preview-home.png",
     animations: "disabled",
   });
+  for (const width of [1864, 1024, 768, 390]) {
+    await page.setViewportSize({ width, height: width === 390 ? 844 : 1000 });
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth + 1,
+      ),
+    ).toBe(true);
+    await expect(page.locator(".chapter-grid > li")).toHaveCount(12);
+    if (width === 390) {
+      await page.screenshot({
+        path: "docs/screenshots/preview-home-mobile.png",
+        animations: "disabled",
+        fullPage: true,
+      });
+    }
+  }
+  expect(
+    (
+      await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+        .analyze()
+    ).violations,
+  ).toEqual([]);
+  await page.setViewportSize({ width: 1864, height: 1080 });
+  await page.getByRole("button", { name: /Switch to dark/ }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await page.screenshot({
+    path: "docs/screenshots/preview-home-dark.png",
+    animations: "disabled",
+  });
+  expect(
+    (
+      await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+        .analyze()
+    ).violations,
+  ).toEqual([]);
+  await page.setViewportSize({ width: 1440, height: 1000 });
   const fresh = await browser.newContext();
   const other = await fresh.newPage();
   await other.goto("http://127.0.0.1:3116/");
